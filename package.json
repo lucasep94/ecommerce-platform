@@ -10,9 +10,11 @@
     "dev:api": "turbo run dev --filter=@ecommerce/api",
     "dev:frontend": "turbo run dev --filter=@ecommerce/frontend",
     "db:generate": "pnpm --filter @ecommerce/database run generate",
-    "db:migrate": "pnpm --filter @ecommerce/database run migrate"
+    "db:migrate": "pnpm --filter @ecommerce/database run migrate",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "turbo": "^2.3.3",
     "typescript": "^5.6.3"
   },

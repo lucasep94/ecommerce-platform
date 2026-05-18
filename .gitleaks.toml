@@ -1,0 +1,12 @@
+title = "ecommerce-platform gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+  '''pnpm-lock\.yaml''',
+  '''package-lock\.json''',
+  '''\.env\.example''',
+]

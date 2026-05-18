@@ -1,16 +1,15 @@
-import "dotenv/config";
+import { env } from "./lib/env";
 import express, { type Application, type Request, type Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
 const app: Application = express();
-const port = Number(process.env.PORT ?? 4000);
 
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? "http://localhost:3000",
+    origin: env.FRONTEND_URL,
     credentials: true,
   }),
 );
@@ -29,9 +28,9 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 if (require.main === module) {
-  app.listen(port, () => {
+  app.listen(env.PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`API listening on http://localhost:${port}`);
+    console.log(`API listening on http://localhost:${env.PORT}`);
   });
 }
 
