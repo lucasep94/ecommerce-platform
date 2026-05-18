@@ -1,0 +1,25 @@
+{
+  "name": "ecommerce-platform",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "dev:api": "turbo run dev --filter=@ecommerce/api",
+    "dev:frontend": "turbo run dev --filter=@ecommerce/frontend",
+    "db:generate": "pnpm --filter @ecommerce/database run generate",
+    "db:migrate": "pnpm --filter @ecommerce/database run migrate",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "turbo": "^2.3.3",
+    "typescript": "^5.6.3"
+  },
+  "packageManager": "pnpm@9.12.3",
+  "engines": {
+    "node": ">=20"
+  }
+}

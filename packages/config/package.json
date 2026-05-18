@@ -1,0 +1,10 @@
+{
+  "name": "@ecommerce/config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "tsconfig.base.json",
+    "eslint.base.cjs"
+  ]
+}

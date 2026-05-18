@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --verbose
+else
+  echo ""
+  echo "WARNING: gitleaks is not installed — skipping secret scan."
+  echo "Install: https://github.com/gitleaks/gitleaks#installing"
+  echo "  Windows:  scoop install gitleaks   (or)   choco install gitleaks"
+  echo "  macOS:    brew install gitleaks"
+  echo "  Linux:    see release page"
+  echo ""
+fi
