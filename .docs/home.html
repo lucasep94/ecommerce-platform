@@ -1,0 +1,1906 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1280" />
+<title>Storely — A better way to shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FCFCFD;
+    --bg-warm: #F3E0D2;
+    --border: #E5E5E5;
+    --text: #4C4B4D;
+    --heading: #000000;
+    --accent: #FCAF18;
+    --muted: #8a8a8d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-width: 1280px;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--heading);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+
+  .wrap { max-width: 1360px; margin: 0 auto; padding: 0 40px; }
+
+  /* ---------- Utility bar ---------- */
+  .utility {
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .utility .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 36px;
+  }
+  .util-left, .util-right { display: flex; align-items: center; gap: 22px; }
+  .util-item {
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    transition: color .15s ease;
+  }
+  .util-item:hover { color: var(--heading); }
+  .util-item .caret { font-size: 9px; opacity: .6; }
+  .util-divider { width: 1px; height: 14px; background: var(--border); }
+
+  /* ---------- Main nav ---------- */
+  .nav {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .nav .wrap {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 80px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 2px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--heading);
+    letter-spacing: -0.03em;
+  }
+  .brand .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    margin: 14px 0 0 2px;
+  }
+  .search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    height: 48px;
+    padding: 0 6px 0 20px;
+    background: #fff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .search:focus-within {
+    border-color: #c8c8cc;
+    box-shadow: 0 0 0 4px rgba(252,175,24,.12);
+  }
+  .search-cat {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--text);
+    font-size: 13px;
+    padding-right: 14px;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    height: 22px;
+  }
+  .search input {
+    flex: 1;
+    border: 0;
+    outline: 0;
+    padding: 0 14px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    color: var(--heading);
+    background: transparent;
+  }
+  .search input::placeholder { color: var(--muted); }
+  .search-btn {
+    border: 0;
+    background: var(--accent);
+    color: var(--heading);
+    height: 38px;
+    padding: 0 22px;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    transition: background-color .15s ease, transform .1s ease;
+  }
+  .search-btn:hover { background: #ffbe3a; }
+  .search-btn:active { transform: scale(.97); }
+  .nav-actions {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .icon-btn {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 999px;
+    color: var(--text);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .icon-btn:hover { background: #f6f6f7; color: var(--heading); }
+  .icon-btn .label {
+    font-size: 13px; font-weight: 700; font-family: 'Lato', sans-serif;
+  }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .count-badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    min-width: 18px; height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--heading);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    display: inline-flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+
+  /* ---------- Category pills ---------- */
+  .cats {
+    border-bottom: 1px solid var(--border);
+  }
+  .cats .wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 56px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .cats .wrap::-webkit-scrollbar { display: none; }
+  .pill {
+    flex: 0 0 auto;
+    height: 36px;
+    padding: 0 18px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--text);
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all .15s ease;
+  }
+  .pill:hover { color: var(--heading); border-color: #c8c8cc; }
+  .pill.active {
+    background: var(--heading);
+    color: #fff;
+    border-color: var(--heading);
+  }
+  .pill .all-icon {
+    width: 14px; height: 14px;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+    gap: 2px;
+  }
+  .pill .all-icon span { background: currentColor; border-radius: 1px; }
+
+  /* ---------- Hero ---------- */
+  section.hero {
+    margin-top: 32px;
+  }
+  .hero-card {
+    background: var(--bg-warm);
+    border-radius: 24px;
+    padding: 64px 72px;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--heading);
+  }
+  .hero-eyebrow::before {
+    content: ""; width: 24px; height: 1px; background: var(--heading);
+  }
+  .hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 64px;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 20px 0 20px;
+    color: var(--heading);
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(transparent 64%, var(--accent) 64% 92%, transparent 92%);
+    padding: 0 4px;
+  }
+  .hero p.lede {
+    font-size: 16px;
+    color: var(--text);
+    max-width: 480px;
+    margin: 0 0 36px;
+  }
+  .hero-cta-row { display: flex; align-items: center; gap: 14px; }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--heading);
+    border: 0;
+    padding: 0 28px;
+    height: 52px;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    display: inline-flex; align-items: center; gap: 10px;
+    transition: background-color .15s ease, transform .1s ease;
+  }
+  .btn-primary:hover { background: #ffbe3a; }
+  .btn-primary:active { transform: scale(.98); }
+  .btn-outline {
+    background: transparent;
+    color: var(--heading);
+    border: 1px solid var(--heading);
+    padding: 0 28px;
+    height: 52px;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    display: inline-flex; align-items: center; gap: 10px;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .btn-outline:hover { background: var(--heading); color: #fff; }
+  .hero-meta {
+    margin-top: 36px;
+    display: flex; gap: 40px;
+    border-top: 1px solid rgba(0,0,0,.08);
+    padding-top: 24px;
+  }
+  .hero-meta div b {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    color: var(--heading);
+    font-weight: 700;
+  }
+  .hero-meta div span {
+    font-size: 12px;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .hero-stage {
+    position: relative;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-product-card {
+    position: absolute;
+    bottom: 12%;
+    left: -8%;
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px 18px;
+    width: 240px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    z-index: 2;
+  }
+  .hero-product-card .cat {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .hero-product-card .name {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--heading);
+    font-weight: 600;
+    font-size: 14px;
+    margin: 4px 0 8px;
+  }
+  .hero-product-card .stars {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .hero-product-card .price {
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .hero-product-card .price b {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--heading);
+  }
+  .hero-product-card .price s {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .hero-discount-badge {
+    position: absolute;
+    top: 4%; right: 4%;
+    width: 84px; height: 84px;
+    background: var(--accent);
+    color: var(--heading);
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    z-index: 3;
+    transform: rotate(-8deg);
+  }
+  .hero-discount-badge b { font-size: 24px; line-height: 1; }
+  .hero-discount-badge span { font-size: 10px; letter-spacing: 0.08em; }
+
+  /* Hero hero-image placeholder */
+  .placeholder-img {
+    width: 100%; height: 100%;
+    background-color: #fff;
+    background-image:
+      repeating-linear-gradient(
+        135deg,
+        rgba(0,0,0,0.03) 0,
+        rgba(0,0,0,0.03) 1px,
+        transparent 1px,
+        transparent 10px);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-align: center;
+    padding: 12px;
+  }
+
+  .hero-img-wrap {
+    width: 86%; height: 86%;
+    position: relative;
+  }
+  .hero-dots {
+    position: absolute;
+    left: 0; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 10px;
+    z-index: 4;
+  }
+  .hero-dots .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(0,0,0,.2);
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .hero-dots .dot.active {
+    background: var(--heading);
+    height: 24px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Quick access strip ---------- */
+  .quick {
+    margin-top: 28px;
+    background: var(--bg-warm);
+    border-radius: 20px;
+    padding: 18px 24px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+  .quick-greeting {
+    display: flex; align-items: center; gap: 14px;
+    padding-right: 16px;
+    border-right: 1px solid rgba(0,0,0,.08);
+  }
+  .avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f7d7be 0%, #e8b893 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--heading);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    border: 2px solid #fff;
+    flex-shrink: 0;
+  }
+  .quick-greeting .text small {
+    display: block;
+    font-size: 11px; color: var(--text); letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .quick-greeting .text b {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading);
+    font-size: 15px;
+  }
+  .quick-tile {
+    display: flex; align-items: center; gap: 14px;
+    padding: 6px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color .15s ease;
+    position: relative;
+  }
+  .quick-tile:hover { background: rgba(255,255,255,.5); }
+  .quick-tile .glyph {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--heading);
+    flex-shrink: 0;
+  }
+  .quick-tile .glyph svg { width: 24px; height: 24px; }
+  .quick-tile .meta b {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading);
+    font-size: 14px;
+  }
+  .quick-tile .meta span {
+    font-size: 12px; color: var(--text);
+  }
+  .quick-tile .sale {
+    position: absolute;
+    top: 0; right: 6px;
+    background: var(--accent);
+    color: var(--heading);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+  }
+  .quick-next {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--heading);
+    transition: background-color .15s ease;
+  }
+  .quick-next:hover { background: var(--accent); }
+
+  /* ---------- Section headers ---------- */
+  section.block { margin-top: 80px; }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: end;
+    margin-bottom: 28px;
+  }
+  .section-head .left h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--heading);
+    letter-spacing: -0.01em;
+  }
+  .section-head .left .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .see-more {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--heading);
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s ease;
+    padding-bottom: 2px;
+  }
+  .see-more:hover { border-color: var(--heading); }
+
+  /* ---------- Shop by category grid ---------- */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .cat-card {
+    cursor: pointer;
+    transition: transform .2s ease;
+  }
+  .cat-card:hover { transform: translateY(-4px); }
+  .cat-card .ph {
+    aspect-ratio: 1/1;
+    border-radius: 20px;
+    background: var(--bg-warm);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card .ph .shape {
+    width: 60%; aspect-ratio: 1/1;
+    border-radius: 50%;
+    opacity: 0.85;
+  }
+  .cat-card.beauty .ph { background: linear-gradient(135deg, #f7e6d5 0%, #f3e0d2 100%); }
+  .cat-card.beauty .shape {
+    background: linear-gradient(180deg, #c8b8e0 0%, #6e5b9c 100%);
+    border-radius: 30px;
+    width: 38%;
+    aspect-ratio: .42/1;
+  }
+  .cat-card.computers .ph { background: #efeef0; }
+  .cat-card.computers .shape {
+    background: linear-gradient(180deg, #2b2b30 0%, #4a4a52 100%);
+    border-radius: 6px;
+    width: 70%;
+    aspect-ratio: 1.5/1;
+    position: relative;
+  }
+  .cat-card.computers .shape::after {
+    content: ""; position: absolute; left: 6%; right: 6%; top: 6%; bottom: 18%;
+    background: linear-gradient(135deg, #e84142 0%, #1a1a22 100%);
+    border-radius: 3px;
+  }
+  .cat-card.audio .ph { background: #e9e6e2; }
+  .cat-card.audio .shape {
+    background: #1f1f23;
+    border-radius: 50% 50% 8px 8px;
+    width: 55%;
+    aspect-ratio: 1/.9;
+    position: relative;
+  }
+  .cat-card.audio .shape::before,
+  .cat-card.audio .shape::after {
+    content: ""; position: absolute; bottom: 20%; width: 22%; aspect-ratio: 1/1.5;
+    background: #1f1f23; border-radius: 50%;
+  }
+  .cat-card.audio .shape::before { left: -12%; }
+  .cat-card.audio .shape::after { right: -12%; }
+  .cat-card.toys .ph { background: #f3eee7; }
+  .cat-card.toys .shape {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d8c3a8 100%);
+    width: 65%;
+  }
+  .cat-card .label {
+    margin-top: 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--heading);
+  }
+  .cat-card .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ---------- Deals split ---------- */
+  .deals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .deal-card {
+    background: var(--bg-warm);
+    border-radius: 20px;
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: 20px;
+    min-height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+  .deal-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--heading);
+    margin-bottom: 8px;
+  }
+  .deal-card p {
+    font-size: 13px;
+    color: var(--text);
+    margin: 0 0 20px;
+    max-width: 280px;
+  }
+  .deal-card .see {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--heading);
+    display: inline-flex; align-items: center; gap: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--heading);
+  }
+  .deal-illust {
+    width: 100%; aspect-ratio: 1/1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .deal-illust .controller {
+    width: 80%; aspect-ratio: 1.6/1;
+    background: linear-gradient(135deg, #2a2a2f 0%, #18181b 100%);
+    border-radius: 40px 40px 60px 60px / 28px 28px 80px 80px;
+    position: relative;
+  }
+  .deal-illust .controller::before,
+  .deal-illust .controller::after {
+    content: ""; position: absolute; top: 24%; width: 14%; aspect-ratio: 1/1;
+    border-radius: 50%; background: #3a3a40;
+  }
+  .deal-illust .controller::before { left: 20%; }
+  .deal-illust .controller::after { right: 20%; background: #1a8fff; }
+  .deal-illust .clock {
+    width: 70%; aspect-ratio: 1/1;
+    background: #fff;
+    border: 8px solid #1f1f23;
+    border-radius: 50%;
+    position: relative;
+  }
+  .deal-illust .clock::before {
+    content: ""; position: absolute; left: 50%; top: 20%;
+    width: 3px; height: 30%; background: #1f1f23;
+    transform-origin: bottom center;
+    transform: translateX(-50%);
+  }
+  .deal-illust .clock::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: 3px; height: 24%; background: #1f1f23;
+    transform-origin: top center;
+    transform: translateX(-50%) rotate(70deg);
+  }
+  .deal-card .badge-inline {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--heading);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ---------- Trust banner ---------- */
+  .trust {
+    background: var(--bg-warm);
+    border-radius: 24px;
+    padding: 64px 72px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .trust .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: block;
+  }
+  .trust h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--heading);
+    margin-bottom: 18px;
+    text-wrap: balance;
+  }
+  .trust p {
+    font-size: 15px;
+    color: var(--text);
+    max-width: 460px;
+    margin: 0 0 32px;
+  }
+  .trust-stage {
+    display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 1.2/1;
+    position: relative;
+  }
+  .trust-box {
+    width: 70%;
+    aspect-ratio: 1.4/1;
+    background: linear-gradient(180deg, #d4b896 0%, #b8966e 100%);
+    border-radius: 4px 4px 8px 8px;
+    position: relative;
+    transform: perspective(800px) rotateX(8deg);
+  }
+  .trust-box::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 16px;
+    background: rgba(0,0,0,.12);
+    border-radius: 4px 4px 0 0;
+  }
+  .trust-box::after {
+    content: "";
+    position: absolute;
+    left: 30%; right: 30%; top: 16px;
+    height: 6px;
+    background: rgba(0,0,0,.2);
+  }
+  .trust-features {
+    display: flex; gap: 28px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,.1);
+  }
+  .trust-features div b {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading);
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .trust-features div span {
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* ---------- Product card grids ---------- */
+  .scroller {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  .scroller.scroll-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .scroller.scroll-row .card {
+    flex: 0 0 calc((100% - 80px) / 5);
+    scroll-snap-align: start;
+  }
+  .scroller.scroll-row::-webkit-scrollbar { height: 6px; }
+  .scroller.scroll-row::-webkit-scrollbar-track { background: transparent; }
+  .scroller.scroll-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid transparent;
+    transition: border-color .15s ease, transform .15s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--border);
+    transform: translateY(-2px);
+  }
+  .card .badge {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: var(--accent);
+    color: var(--heading);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 1;
+    letter-spacing: 0.04em;
+  }
+  .card .wish {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    border: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    color: var(--text);
+    z-index: 1;
+    transition: color .15s ease, background-color .15s ease;
+  }
+  .card:hover .wish { display: inline-flex; }
+  .card .wish:hover { color: var(--heading); background: #fff; }
+  .card .wish.active { color: #e74c3c; }
+  .card .wish svg { width: 16px; height: 16px; }
+  .card .pimg {
+    aspect-ratio: 1/1;
+    margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .card .pimg .product-shape {
+    width: 72%; aspect-ratio: 1/1;
+    border-radius: 50%;
+  }
+  .card .ship {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .card .brand-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .card .pname {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--heading);
+    line-height: 1.35;
+    margin: 0 0 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 38px;
+  }
+  .stars {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .stars .star-row {
+    display: inline-flex; gap: 1px; color: var(--accent);
+  }
+  .stars .star-row svg { width: 12px; height: 12px; }
+  .price-row {
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .price-row b {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--heading);
+    letter-spacing: -0.01em;
+  }
+  .price-row s {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .price-row .save {
+    margin-left: auto;
+    font-size: 11px;
+    color: #1f8a5b;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* Product shape variants */
+  .shoe { background: linear-gradient(135deg, #2a2a2f 0%, #4a4a52 100%); border-radius: 50% 50% 30% 70% / 60% 50% 50% 40%; aspect-ratio: 1.4/1 !important; width: 80% !important; }
+  .shoe.white { background: linear-gradient(135deg, #f4f4f4 0%, #d8d8d8 100%); }
+  .shoe.red { background: linear-gradient(135deg, #e74c3c 0%, #a32622 100%); }
+  .shoe.gray { background: linear-gradient(135deg, #b0b0b8 0%, #6d6d75 100%); }
+  .cable { background: linear-gradient(135deg, #1a1a1f 0%, #3a3a40 100%); border-radius: 50% 30% 50% 30%; width: 60% !important; }
+  .tv { background: linear-gradient(180deg, #1f1f23 0%, #0a0a0c 100%); border-radius: 4px; aspect-ratio: 1.6/1 !important; width: 84% !important; position: relative; }
+  .tv::after { content: ""; position: absolute; left: 4%; right: 4%; top: 4%; bottom: 4%; background: linear-gradient(135deg, #2a6fdb 0%, #6db9ff 100%); border-radius: 2px; }
+  .pot { background: linear-gradient(180deg, #c5c5cc 0%, #6e6e76 100%); border-radius: 12px; width: 70% !important; aspect-ratio: 1/1.05 !important; position: relative; }
+  .pot::after { content: ""; position: absolute; left: 12%; right: 12%; top: 8%; bottom: 35%; background: #1a1a22; border-radius: 4px; }
+  .dryer { background: linear-gradient(135deg, #2a2a2f 0%, #1a1a22 100%); border-radius: 50% 8px 8px 50%; width: 75% !important; aspect-ratio: 1.4/1 !important; }
+  .pan { background: radial-gradient(circle at 50% 50%, #2a2a2f 0%, #0a0a0c 70%); border-radius: 50%; width: 80% !important; }
+  .mouse { background: linear-gradient(180deg, #2a2a2f 0%, #1a1a22 100%); border-radius: 50% 50% 40% 40%; width: 60% !important; aspect-ratio: 1/1.3 !important; }
+  .watch { background: linear-gradient(135deg, #3a3a40 0%, #1a1a22 100%); border-radius: 28px; width: 50% !important; aspect-ratio: .8/1 !important; position: relative; }
+  .watch::after { content: ""; position: absolute; left: 12%; right: 12%; top: 18%; bottom: 18%; background: radial-gradient(circle at 50% 50%, #4a8fdb 0%, #1a1a22 80%); border-radius: 16px; }
+  .headphone { background: #1f1f23; border-radius: 50% 50% 8px 8px; width: 60% !important; aspect-ratio: 1/.85 !important; position: relative; }
+  .headphone::before, .headphone::after { content: ""; position: absolute; bottom: 24%; width: 22%; aspect-ratio: 1/1.4; background: #1f1f23; border-radius: 40%; }
+  .headphone::before { left: -10%; }
+  .headphone::after { right: -10%; }
+  .earbuds { background: linear-gradient(135deg, #2a2a2f 0%, #18181b 100%); border-radius: 50%; width: 60% !important; aspect-ratio: 1.3/1 !important; }
+  .vacuum { background: radial-gradient(circle at 40% 40%, #5a5a62 0%, #1f1f23 80%); border-radius: 50%; width: 65% !important; }
+  .console { background: linear-gradient(135deg, #f5f5f7 0%, #d8d8de 100%); border-radius: 6px; width: 70% !important; aspect-ratio: 1.5/1 !important; }
+  .speaker { background: linear-gradient(180deg, #2a2a2f 0%, #1a1a22 100%); border-radius: 16px; width: 70% !important; aspect-ratio: 1.5/.9 !important; }
+  .projector { background: #18181b; border-radius: 8px; width: 80% !important; aspect-ratio: 1.4/1 !important; position: relative; }
+  .projector::after { content: ""; position: absolute; left: 18%; right: 50%; top: 22%; bottom: 22%; background: #3a3a40; border-radius: 50%; }
+
+  /* ---------- Promo split (Comfy styles) ---------- */
+  .promo-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .promo-card {
+    background: var(--bg-warm);
+    border-radius: 20px;
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+    gap: 16px;
+    min-height: 240px;
+    position: relative;
+    overflow: hidden;
+  }
+  .promo-card .copy {
+    align-self: start;
+  }
+  .promo-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--heading);
+    margin-bottom: 8px;
+  }
+  .promo-card p {
+    font-size: 13px;
+    color: var(--text);
+    margin: 0 0 16px;
+    max-width: 240px;
+  }
+  .promo-card .see {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--heading);
+    display: inline-flex; align-items: center; gap: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--heading);
+  }
+  .promo-illust {
+    aspect-ratio: .8/1;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,0) 100%);
+    display: flex; align-items: flex-end; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .promo-illust .silhouette {
+    width: 80%;
+    height: 90%;
+    background: linear-gradient(180deg, #d4a47d 0%, #a87b54 100%);
+    border-radius: 60% 60% 4px 4px / 40% 40% 4px 4px;
+  }
+  .promo-illust.him .silhouette { background: linear-gradient(180deg, #6b8cb5 0%, #3d5f8a 100%); border-radius: 50% 50% 4px 4px / 35% 35% 4px 4px; }
+  .promo-cta-inline {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 16px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,.08);
+  }
+  .promo-cta-inline .tile-img {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .promo-cta-inline .tile-img .bag {
+    width: 70%; height: 60%;
+    background: linear-gradient(135deg, #a87b54 0%, #6e4f33 100%);
+    border-radius: 4px 4px 4px 4px;
+    border-top: 4px solid transparent;
+    position: relative;
+  }
+  .promo-cta-inline .tile-img .bag::before {
+    content: "";
+    position: absolute;
+    top: -8px; left: 16%; right: 16%;
+    height: 12px;
+    border: 2px solid #6e4f33;
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+  }
+  .promo-cta-inline .tile-img .shirt {
+    width: 75%; height: 55%;
+    background: repeating-linear-gradient(45deg, #6b8cb5 0 6px, #4d6f9a 6px 12px);
+    border-radius: 4px;
+  }
+  .promo-cta-inline .tile-meta b {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading);
+    font-size: 13px;
+  }
+  .promo-cta-inline .tile-meta span {
+    font-size: 11px;
+    color: var(--text);
+  }
+  .promo-cta-inline .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: var(--heading);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+  .promo-arrow {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    border: 0;
+  }
+
+  /* ---------- Mini cat row ---------- */
+  .mini-cats {
+    background: var(--bg-warm);
+    border-radius: 20px;
+    padding: 18px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .mini-cat {
+    display: flex; align-items: center; gap: 12px;
+    padding: 6px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color .15s ease;
+    position: relative;
+  }
+  .mini-cat:hover { background: rgba(255,255,255,.5); }
+  .mini-cat.active {
+    background: rgba(255,255,255,.6);
+    box-shadow: inset 0 -2px 0 var(--heading);
+  }
+  .mini-cat .glyph {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mini-cat .glyph .obj {
+    width: 70%; height: 70%; border-radius: 50%;
+  }
+  .mini-cat .meta b {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading);
+    font-size: 13px;
+  }
+  .mini-cat .meta span { font-size: 11px; color: var(--text); }
+  .mini-arrow {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--heading);
+  }
+
+  /* ---------- Newsletter ---------- */
+  .newsletter {
+    background: var(--bg-warm);
+    border-radius: 24px;
+    padding: 64px 72px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .newsletter .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    display: block;
+    margin-bottom: 14px;
+  }
+  .newsletter h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--heading);
+    margin-bottom: 14px;
+    text-wrap: balance;
+  }
+  .newsletter p {
+    font-size: 15px;
+    color: var(--text);
+    max-width: 440px;
+    margin: 0 0 28px;
+  }
+  .news-form {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px;
+    max-width: 460px;
+    border: 1px solid transparent;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .news-form:focus-within {
+    border-color: #c8c8cc;
+    box-shadow: 0 0 0 4px rgba(252,175,24,.15);
+  }
+  .news-form input {
+    flex: 1;
+    border: 0; outline: 0;
+    background: transparent;
+    padding: 0 16px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    color: var(--heading);
+    height: 44px;
+  }
+  .news-form input::placeholder { color: var(--muted); }
+  .news-form button {
+    background: var(--accent);
+    color: var(--heading);
+    border: 0;
+    border-radius: 999px;
+    height: 44px;
+    padding: 0 26px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    transition: background-color .15s ease;
+  }
+  .news-form button:hover { background: #ffbe3a; }
+  .news-feedback {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #1f8a5b;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+  .news-feedback.show { opacity: 1; }
+  .news-stage {
+    aspect-ratio: 1/1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .news-illust {
+    width: 70%; aspect-ratio: .8/1;
+    background: linear-gradient(180deg, #d4a47d 0%, #a87b54 60%, #a87b54 100%);
+    border-radius: 60% 60% 12px 12px / 30% 30% 12px 12px;
+    position: relative;
+  }
+  .news-illust::before {
+    content: "";
+    position: absolute;
+    top: 12%; left: 50%; transform: translateX(-50%);
+    width: 60%; aspect-ratio: 1/1;
+    background: linear-gradient(180deg, #e8b893 0%, #d4a47d 100%);
+    border-radius: 50%;
+  }
+  .news-illust::after {
+    content: "";
+    position: absolute;
+    top: 6%; left: 50%; transform: translateX(-50%);
+    width: 64%; aspect-ratio: 1/.5;
+    background: #5a3e26;
+    border-radius: 50% 50% 0 0;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    background: var(--bg-warm);
+    margin-top: 80px;
+    padding: 64px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+    gap: 48px;
+  }
+  .foot-brand .brand { margin-bottom: 18px; }
+  .foot-brand p {
+    font-size: 13px;
+    color: var(--text);
+    max-width: 280px;
+    margin: 0 0 24px;
+  }
+  .socials { display: flex; gap: 10px; }
+  .socials a {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--heading);
+    transition: background-color .15s ease;
+  }
+  .socials a:hover { background: var(--accent); }
+  .socials svg { width: 16px; height: 16px; }
+  footer h5 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--heading);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  footer ul {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  footer ul a {
+    font-size: 13px; color: var(--text);
+    transition: color .15s ease;
+  }
+  footer ul a:hover { color: var(--heading); }
+  .foot-bottom {
+    margin-top: 56px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(0,0,0,.08);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .foot-bottom .legal { display: flex; gap: 22px; }
+  .foot-bottom .pays { display: flex; gap: 8px; align-items: center; }
+  .pays .chip {
+    height: 22px; padding: 0 8px;
+    background: #fff; border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: var(--heading);
+    display: inline-flex; align-items: center;
+    letter-spacing: 0.06em;
+  }
+
+  /* utility */
+  .arrow-r { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+
+<!-- ============ UTILITY BAR ============ -->
+<div class="utility">
+  <div class="wrap">
+    <div class="util-left">
+      <span class="util-item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Deliver to United States
+        <span class="caret">▾</span>
+      </span>
+      <span class="util-divider"></span>
+      <span class="util-item">English (EN) <span class="caret">▾</span></span>
+      <span class="util-divider"></span>
+      <span class="util-item">USD <span class="caret">▾</span></span>
+    </div>
+    <div class="util-right">
+      <span class="util-item">Track order</span>
+      <span class="util-divider"></span>
+      <span class="util-item">Customer service</span>
+      <span class="util-divider"></span>
+      <span class="util-item">Sell on Storely</span>
+      <span class="util-divider"></span>
+      <span class="util-item">Gift cards</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN NAV ============ -->
+<div class="nav">
+  <div class="wrap">
+    <a class="brand" href="#">storely<span class="dot"></span></a>
+    <div class="search">
+      <span class="search-cat">
+        All categories
+        <span class="caret">▾</span>
+      </span>
+      <input type="text" placeholder="Search for products, brands and more…" />
+      <button class="search-btn">Search</button>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span class="label">Account</span>
+      </button>
+      <button class="icon-btn" id="wishlist-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        <span class="label">Wishlist</span>
+        <span class="count-badge" id="wish-count">4</span>
+      </button>
+      <button class="icon-btn" id="cart-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5h2l2.5 12.5a2 2 0 0 0 2 1.5h8.5a2 2 0 0 0 2-1.5L22 8H6"/><circle cx="10" cy="22" r="1.5"/><circle cx="18" cy="22" r="1.5"/></svg>
+        <span class="label">Cart</span>
+        <span class="count-badge" id="cart-count">2</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CATEGORY PILLS ============ -->
+<div class="cats">
+  <div class="wrap" id="pill-row">
+    <button class="pill active">
+      <span class="all-icon"><span></span><span></span><span></span><span></span></span>
+      All categories
+    </button>
+    <button class="pill">Today's deals</button>
+    <button class="pill">New arrivals</button>
+    <button class="pill">Electronics</button>
+    <button class="pill">Home &amp; Kitchen</button>
+    <button class="pill">Fashion</button>
+    <button class="pill">Beauty</button>
+    <button class="pill">Toys &amp; Games</button>
+    <button class="pill">Sports &amp; Outdoor</button>
+    <button class="pill">Books</button>
+    <button class="pill">Gift cards</button>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero wrap">
+  <div class="hero-card">
+    <div class="hero-dots" id="hero-dots">
+      <span class="dot active" data-i="0"></span>
+      <span class="dot" data-i="1"></span>
+      <span class="dot" data-i="2"></span>
+    </div>
+    <div>
+      <span class="hero-eyebrow">Featured this week</span>
+      <h1>Sound that <em>moves</em> with&nbsp;you, all season&nbsp;long.</h1>
+      <p class="lede">Studio‑grade headphones, earbuds and speakers from the brands you trust — curated, reviewed, and shipped fast.</p>
+      <div class="hero-cta-row">
+        <button class="btn-primary">
+          Shop the edit
+          <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <button class="btn-outline">Watch the story</button>
+      </div>
+      <div class="hero-meta">
+        <div><b>2M+</b><span>Curated products</span></div>
+        <div><b>120</b><span>Countries shipped</span></div>
+        <div><b>4.8★</b><span>Customer rating</span></div>
+      </div>
+    </div>
+    <div class="hero-stage">
+      <div class="hero-discount-badge"><b>50%</b><span>OFF</span></div>
+      <div class="hero-img-wrap">
+        <div class="placeholder-img">
+          <div>
+            HERO PRODUCT IMAGE<br>
+            studio headphones, 1:1
+          </div>
+        </div>
+        <div style="position:absolute; inset:8% 8% 8% 8%; display:flex; align-items:center; justify-content:center;">
+          <div class="product-shape headphone" style="width:62%; aspect-ratio:1/.95;"></div>
+        </div>
+      </div>
+      <div class="hero-product-card">
+        <div class="cat">Audio &amp; Headphones</div>
+        <div class="name">JBL T460BT Wireless Over‑Ear</div>
+        <div class="stars">
+          <span class="star-row">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
+          </span>
+          1,245 reviews
+        </div>
+        <div class="price"><b>$125.00</b><s>$250.00</s></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUICK ACCESS ============ -->
+<section class="wrap" style="margin-top:0;">
+  <div class="quick">
+    <div class="quick-greeting">
+      <div class="avatar">TC</div>
+      <div class="text">
+        <small>Welcome back</small>
+        <b>Hi, Tomas — your picks await 👋</b>
+      </div>
+    </div>
+    <div class="quick-tile">
+      <div class="glyph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h18l-2 12H5z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+      </div>
+      <div class="meta"><b>Your orders</b><span>3 in transit</span></div>
+    </div>
+    <div class="quick-tile">
+      <div class="glyph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
+      </div>
+      <div class="meta"><b>Electronics</b><span>Recently viewed</span></div>
+      <span class="sale">‑30%</span>
+    </div>
+    <div class="quick-tile">
+      <div class="glyph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+      </div>
+      <div class="meta"><b>Home &amp; Kitchen</b><span>Recently viewed</span></div>
+      <span class="sale">‑30%</span>
+    </div>
+    <div class="quick-tile">
+      <div class="glyph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </div>
+      <div class="meta"><b>Watch list</b><span>4 items</span></div>
+    </div>
+    <button class="quick-next" aria-label="More">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ============ SHOP BY CATEGORY ============ -->
+<section class="block wrap">
+  <div class="section-head">
+    <div class="left">
+      <span class="eyebrow">Discover</span>
+      <h2>Shop by category</h2>
+    </div>
+    <a class="see-more" href="#">All departments
+      <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+  <div class="cat-grid">
+    <a class="cat-card beauty" href="#">
+      <div class="ph"><div class="shape"></div></div>
+      <div class="label">Beauty &amp; Care</div>
+      <div class="sub">3,420 products</div>
+    </a>
+    <a class="cat-card computers" href="#">
+      <div class="ph"><div class="shape"></div></div>
+      <div class="label">Computer &amp; Accessories</div>
+      <div class="sub">1,890 products</div>
+    </a>
+    <a class="cat-card audio" href="#">
+      <div class="ph"><div class="shape"></div></div>
+      <div class="label">Audio &amp; Headphones</div>
+      <div class="sub">740 products</div>
+    </a>
+    <a class="cat-card toys" href="#">
+      <div class="ph"><div class="shape"></div></div>
+      <div class="label">Toys &amp; Games</div>
+      <div class="sub">2,180 products</div>
+    </a>
+  </div>
+</section>
+
+<!-- ============ DEALS SPLIT ============ -->
+<section class="block wrap">
+  <div class="deals">
+    <div class="deal-card">
+      <div>
+        <span class="badge-inline">Storely Basics</span>
+        <h3>The everyday line, made better</h3>
+        <p>Shop our in‑house basics: cables, chargers, controllers and more — at honest prices.</p>
+        <a class="see" href="#">See the collection
+          <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="deal-illust"><div class="controller"></div></div>
+    </div>
+    <div class="deal-card">
+      <div>
+        <span class="badge-inline">Deals &amp; Promotions</span>
+        <h3>Lightning deals end at midnight</h3>
+        <p>Today's flash sale runs across kitchen, audio and beauty — limited stock, limited time.</p>
+        <a class="see" href="#">See all deals
+          <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="deal-illust"><div class="clock"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST BANNER ============ -->
+<section class="block wrap">
+  <div class="trust">
+    <div>
+      <span class="eyebrow">Discover Storely</span>
+      <h2>We deliver beautifully, to your door.</h2>
+      <p>Worldwide shipping across 120 countries. Carbon‑neutral options, signature packaging, and a 30‑day no‑questions return policy.</p>
+      <button class="btn-outline">Learn how it works
+        <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <div class="trust-features">
+        <div><b>Free shipping</b><span>Orders over $35</span></div>
+        <div><b>2‑day delivery</b><span>To major cities</span></div>
+        <div><b>30‑day returns</b><span>No questions asked</span></div>
+      </div>
+    </div>
+    <div class="trust-stage">
+      <div style="width:80%; aspect-ratio:1.2/1; position:relative;">
+        <div class="placeholder-img" style="position:absolute; inset:0;">
+          <div>DELIVERY HERO<br>parcel + lifestyle</div>
+        </div>
+        <div style="position:absolute; inset:14% 14% 8% 14%; display:flex; align-items:flex-end; justify-content:center;">
+          <div class="trust-box"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LAST VIEWED ============ -->
+<section class="block wrap">
+  <div class="section-head">
+    <div class="left">
+      <span class="eyebrow">Pick up where you left off</span>
+      <h2>Last viewed</h2>
+    </div>
+    <a class="see-more" href="#">See more
+      <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+  <div class="scroller scroll-row" id="last-viewed-row">
+    <!-- product cards generated below by template -->
+  </div>
+</section>
+
+<!-- ============ TOP SELLERS ============ -->
+<section class="block wrap">
+  <div class="section-head">
+    <div class="left">
+      <span class="eyebrow">Most wanted right now</span>
+      <h2>Storely top sellers</h2>
+    </div>
+    <a class="see-more" href="#">See more
+      <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+  <div class="scroller" id="top-sellers-row"></div>
+</section>
+
+<!-- ============ COMFY STYLES (PROMO SPLIT) ============ -->
+<section class="block wrap">
+  <div class="promo-split">
+    <div class="promo-card">
+      <div class="copy">
+        <h3>Comfy styles for her</h3>
+        <p>Storely Fashion: clothing, shoes, jewelry, watches, bags and more.</p>
+        <a class="see" href="#">Shop now
+          <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="promo-illust"><div class="silhouette"></div></div>
+      <div class="promo-cta-inline">
+        <div class="tile-img"><div class="bag"></div></div>
+        <div class="tile-meta"><b>Top handbags</b><span>From $39</span></div>
+        <span class="badge">Big sale ‑30%</span>
+        <button class="promo-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="promo-card">
+      <div class="copy">
+        <h3>Comfy styles for him</h3>
+        <p>Storely Fashion: clothing, shoes, jewelry, watches, bags and more.</p>
+        <a class="see" href="#">Shop now
+          <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="promo-illust him"><div class="silhouette"></div></div>
+      <div class="promo-cta-inline">
+        <div class="tile-img"><div class="shirt"></div></div>
+        <div class="tile-meta"><b>Checkered shirt</b><span>From $29</span></div>
+        <span class="badge">Big sale ‑30%</span>
+        <button class="promo-arrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THIS MUST BE FOR YOU ============ -->
+<section class="block wrap">
+  <div class="section-head">
+    <div class="left">
+      <span class="eyebrow">For you, Tomas</span>
+      <h2>This must be for you 👇</h2>
+    </div>
+    <a class="see-more" href="#">See more
+      <svg class="arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+  <div class="scroller" id="recs-row"></div>
+</section>
+
+<!-- ============ MINI CATEGORY ROW ============ -->
+<section class="block wrap">
+  <div class="mini-cats" id="mini-cats">
+    <button class="mini-arrow" aria-label="Previous">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <div class="mini-cat active">
+      <div class="glyph"><div class="obj" style="background:radial-gradient(circle at 40% 40%, #5a5a62, #1f1f23);"></div></div>
+      <div class="meta"><b>Vacuum cleaners</b><span>Big sale ‑20%</span></div>
+    </div>
+    <div class="mini-cat">
+      <div class="glyph"><div class="obj" style="background:linear-gradient(135deg,#f5f5f7,#d8d8de); border-radius:6px;"></div></div>
+      <div class="meta"><b>Consoles</b><span>Big sale ‑30%</span></div>
+    </div>
+    <div class="mini-cat">
+      <div class="glyph"><div class="obj" style="background:linear-gradient(180deg,#2a2a2f,#1a1a22); border-radius:8px;"></div></div>
+      <div class="meta"><b>Portable speakers</b><span>Big sale ‑30%</span></div>
+    </div>
+    <div class="mini-cat">
+      <div class="glyph"><div class="obj" style="background:#18181b; border-radius:6px;"></div></div>
+      <div class="meta"><b>Projectors</b><span>Big sale ‑20%</span></div>
+    </div>
+    <button class="mini-arrow" aria-label="Next">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="block wrap">
+  <div class="newsletter">
+    <div>
+      <span class="eyebrow">Discover Storely</span>
+      <h2>Subscribe and never miss a&nbsp;deal.</h2>
+      <p>Be aware of all discounts and bargains. We send one curated email a week — no spam, ever.</p>
+      <form class="news-form" id="news-form">
+        <input type="email" placeholder="your@email.com" required />
+        <button type="submit">Subscribe</button>
+      </form>
+      <div class="news-feedback" id="news-feedback">✓ Welcome aboard — check your inbox to confirm.</div>
+    </div>
+    <div class="news-stage">
+      <div style="width:80%; aspect-ratio:1/1; position:relative;">
+        <div class="placeholder-img" style="position:absolute; inset:0;">
+          <div>NEWSLETTER HERO<br>lifestyle portrait</div>
+        </div>
+        <div style="position:absolute; inset:6% 6% 0 6%; display:flex; align-items:flex-end; justify-content:center;">
+          <div class="news-illust"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#">storely<span class="dot"></span></a>
+        <p>A modern marketplace for the things you actually want. Curated globally, delivered locally.</p>
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 5.8a8.5 8.5 0 0 1-2.4.7 4.3 4.3 0 0 0 1.8-2.4 8.6 8.6 0 0 1-2.7 1A4.2 4.2 0 0 0 11.5 9a12 12 0 0 1-8.7-4.4 4.2 4.2 0 0 0 1.3 5.7 4.2 4.2 0 0 1-1.9-.5v.1A4.2 4.2 0 0 0 5.6 14a4.2 4.2 0 0 1-1.9.1 4.2 4.2 0 0 0 4 3 8.5 8.5 0 0 1-5.3 1.8H2a12 12 0 0 0 6.4 1.9c7.7 0 12-6.4 12-12v-.5A8.5 8.5 0 0 0 22 5.8z"/></svg></a>
+          <a href="#" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.6 19.3c-.1-.8-.2-2 0-2.9.2-.8 1.2-5.1 1.2-5.1s-.3-.6-.3-1.5c0-1.4.8-2.5 1.8-2.5.8 0 1.3.6 1.3 1.4 0 .8-.5 2-.8 3.2-.2 1 .5 1.7 1.4 1.7 1.7 0 3-1.8 3-4.4 0-2.3-1.7-3.9-4-3.9-2.8 0-4.4 2.1-4.4 4.2 0 .8.3 1.7.7 2.2.1.1.1.2.1.3l-.3 1c0 .2-.2.2-.4.1-1.2-.6-2-2.4-2-3.8 0-3.1 2.2-5.9 6.4-5.9 3.4 0 6 2.4 6 5.6 0 3.4-2.1 6.1-5 6.1-1 0-2-.5-2.3-1.1 0 0-.5 1.9-.6 2.4-.2.8-.8 1.9-1.2 2.5A10 10 0 1 0 12 2z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 8s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.5 5 12 5 12 5h0s-4.5 0-7.3.2c-.4 0-1.2 0-1.9.8C2.2 6.6 2 8 2 8s-.2 1.6-.2 3.2v1.5C1.8 14.4 2 16 2 16s.2 1.4.8 2c.7.8 1.7.8 2.1.9 1.6.2 6.6.2 6.6.2s4.5 0 7.3-.2c.4 0 1.2 0 1.9-.8.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22.2 9.6 22 8 22 8zm-12 6V8.5l6 2.7-6 2.8z"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h5>Get to know us</h5>
+        <ul>
+          <li><a href="#">About Storely</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Sustainability</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Make money with us</h5>
+        <ul>
+          <li><a href="#">Sell on Storely</a></li>
+          <li><a href="#">Become an affiliate</a></li>
+          <li><a href="#">Advertise products</a></li>
+          <li><a href="#">Self‑publish</a></li>
+          <li><a href="#">For brands</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Let us help you</h5>
+        <ul>
+          <li><a href="#">Your account</a></li>
+          <li><a href="#">Your orders</a></li>
+          <li><a href="#">Shipping &amp; policies</a></li>
+          <li><a href="#">Returns &amp; replacements</a></li>
+          <li><a href="#">Help center</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Payment &amp; gifts</h5>
+        <ul>
+          <li><a href="#">Gift cards</a></li>
+          <li><a href="#">Storely credit</a></li>
+          <li><a href="#">Currency converter</a></li>
+          <li><a href="#">Business accounts</a></li>
+          <li><a href="#">Reload balance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="legal">
+        <span>© 2026 Storely Inc.</span>
+        <a href="#">Conditions of use</a>
+        <a href="#">Privacy notice</a>
+        <a href="#">Interest‑based ads</a>
+      </div>
+      <div class="pays">
+        <span class="chip">VISA</span>
+        <span class="chip">MC</span>
+        <span class="chip">AMEX</span>
+        <span class="chip">PAYPAL</span>
+        <span class="chip">APPLE</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ----- Product card template -----
+  function star(filled) {
+    return '<svg viewBox="0 0 24 24" fill="' + (filled ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>';
+  }
+  function stars(rating) {
+    var s = '';
+    for (var i = 0; i < 5; i++) s += star(i < Math.round(rating));
+    return s;
+  }
+  function card(p) {
+    var badge = p.badge ? '<span class="badge">' + p.badge + '</span>' : '';
+    var save = p.save ? '<span class="save">Save $' + p.save + '</span>' : '';
+    var orig = p.orig ? '<s>$' + p.orig.toFixed(2) + '</s>' : '';
+    var shipping = p.ships !== false ? '<div class="ship">Ships to United States</div>' : '';
+    return '<div class="card">' +
+      badge +
+      '<button class="wish" aria-label="Save to wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>' +
+      '<div class="pimg"><div class="product-shape ' + p.shape + '"></div></div>' +
+      shipping +
+      '<div class="brand-lbl">' + p.brand + '</div>' +
+      '<div class="pname">' + p.name + '</div>' +
+      '<div class="stars"><span class="star-row">' + stars(p.rating) + '</span>' + p.reviews.toLocaleString() + ' reviews</div>' +
+      '<div class="price-row"><b>$' + p.price.toFixed(2) + '</b>' + orig + save + '</div>' +
+    '</div>';
+  }
+
+  // Last viewed (scrollable row)
+  var lastViewed = [
+    { brand: 'Puma', name: 'AXIS TR Boot WTR Black Men', shape: 'shoe', price: 150.99, rating: 5, reviews: 342 },
+    { brand: 'Nike', name: 'Air Max Light Red Series', shape: 'shoe white', price: 86.00, rating: 4, reviews: 23 },
+    { brand: 'Adidas', name: 'Fusion Storm Winter', shape: 'shoe red', price: 79.97, rating: 5, reviews: 192 },
+    { brand: 'Nike', name: 'Cloudfoam Pure Running Shoe', shape: 'shoe gray', price: 68.99, rating: 5, reviews: 4971, badge: 'Best seller' },
+    { brand: 'Adidas', name: 'Alpha Bounce Running Shoe', shape: 'shoe', price: 59.94, orig: 70.93, save: 10.99, rating: 5, reviews: 488 },
+    { brand: 'New Balance', name: '574 Core Suede Sneaker', shape: 'shoe white', price: 89.00, rating: 4, reviews: 1208 },
+    { brand: 'Asics', name: 'Gel‑Kayano Trainer Knit', shape: 'shoe gray', price: 99.00, orig: 140.00, rating: 5, reviews: 612 }
+  ];
+  document.getElementById('last-viewed-row').innerHTML = lastViewed.map(card).join('');
+
+  // Top sellers (5 columns)
+  var topSellers = [
+    { brand: 'Storely Basics', name: 'Lightning to USB Cable, 2m', shape: 'cable', price: 5.99, rating: 5, reviews: 11567, badge: 'Best seller' },
+    { brand: 'Skyworth', name: 'D‑Series 24" 1080P Smart TV', shape: 'tv', price: 129.97, rating: 4, reviews: 192, badge: 'Best seller' },
+    { brand: 'Instant Pot', name: 'Duo 7‑in‑1 Electric Cooker', shape: 'pot', price: 79.00, orig: 99.95, rating: 5, reviews: 488, badge: 'Best seller' },
+    { brand: 'Philips', name: '1875W Dry Care Essential Ionic', shape: 'dryer', price: 24.99, rating: 5, reviews: 3643, badge: 'Best seller' },
+    { brand: 'GreenPan', name: 'Stackable Hard Frying Pan 12"', shape: 'pan', price: 59.94, orig: 71.89, save: 11.95, rating: 5, reviews: 488, badge: 'Best seller' }
+  ];
+  document.getElementById('top-sellers-row').innerHTML = topSellers.map(card).join('');
+
+  // Recommendations
+  var recs = [
+    { brand: 'Xiaomi', name: 'Mi Bluetooth Mouse Silver', shape: 'mouse', price: 20.99, rating: 5, reviews: 1898 },
+    { brand: 'Instant Pot', name: 'Duo 7‑in‑1 Electric Cooker', shape: 'pot', price: 400.60, rating: 5, reviews: 167879 },
+    { brand: 'Razer', name: 'Man O\'War 7.1 Headphones', shape: 'headphone', price: 45.45, orig: 54.00, rating: 5, reviews: 167879, badge: 'Best seller' },
+    { brand: 'Sennheiser', name: 'Bluetooth Headphones CX 150BT', shape: 'earbuds', price: 20.50, orig: 32.00, rating: 5, reviews: 167879, badge: 'Best seller' },
+    { brand: 'Xiaomi', name: 'TWS Mi True Wireless Earbuds', shape: 'earbuds', price: 20.50, orig: 32.00, rating: 5, reviews: 15678 }
+  ];
+  document.getElementById('recs-row').innerHTML = recs.map(card).join('');
+
+  // ----- Pills active state -----
+  document.querySelectorAll('#pill-row .pill').forEach(function(p) {
+    p.addEventListener('click', function() {
+      document.querySelectorAll('#pill-row .pill').forEach(function(x){ x.classList.remove('active'); });
+      p.classList.add('active');
+    });
+  });
+
+  // ----- Mini cats active state -----
+  document.querySelectorAll('#mini-cats .mini-cat').forEach(function(p) {
+    p.addEventListener('click', function() {
+      document.querySelectorAll('#mini-cats .mini-cat').forEach(function(x){ x.classList.remove('active'); });
+      p.classList.add('active');
+    });
+  });
+
+  // ----- Hero dots -----
+  document.querySelectorAll('#hero-dots .dot').forEach(function(d) {
+    d.addEventListener('click', function() {
+      document.querySelectorAll('#hero-dots .dot').forEach(function(x){ x.classList.remove('active'); });
+      d.classList.add('active');
+    });
+  });
+
+  // ----- Wishlist hearts -----
+  document.body.addEventListener('click', function(e) {
+    var btn = e.target.closest('.wish');
+    if (!btn) return;
+    e.stopPropagation();
+    btn.classList.toggle('active');
+    var wishEl = document.getElementById('wish-count');
+    var n = parseInt(wishEl.textContent, 10) || 0;
+    wishEl.textContent = btn.classList.contains('active') ? (n + 1) : Math.max(0, n - 1);
+  });
+
+  // ----- Add to cart on product card click -----
+  document.body.addEventListener('click', function(e) {
+    var c = e.target.closest('.card');
+    if (!c) return;
+    if (e.target.closest('.wish')) return;
+    var cartEl = document.getElementById('cart-count');
+    cartEl.textContent = (parseInt(cartEl.textContent, 10) || 0) + 1;
+    var btn = document.getElementById('cart-btn');
+    btn.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }],
+      { duration: 260, easing: 'ease-out' }
+    );
+  });
+
+  // ----- Newsletter -----
+  document.getElementById('news-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var fb = document.getElementById('news-feedback');
+    fb.classList.add('show');
+    this.querySelector('input').value = '';
+    setTimeout(function(){ fb.classList.remove('show'); }, 4000);
+  });
+</script>
+
+</body>
+</html>
