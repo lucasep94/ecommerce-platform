@@ -4,6 +4,7 @@ import type { ProductDTO } from "@ecommerce/types";
 import { formatPrice, calcSave } from "@/lib/format";
 import { RatingStars } from "./RatingStars";
 import { WishlistButton } from "./WishlistButton";
+import { AddToCartButton } from "./AddToCartButton";
 
 function getBadge(product: ProductDTO): string | null {
   if (product.originalPrice) {
@@ -44,8 +45,9 @@ export function ProductCard({ product }: { product: ProductDTO }) {
           </span>
         )}
 
-        <div className="absolute top-2.5 right-2.5">
+        <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
           <WishlistButton productId={product.id} />
+          <AddToCartButton product={product} variant="card" />
         </div>
       </div>
 

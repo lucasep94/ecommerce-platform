@@ -4,11 +4,20 @@ import {
   createProductSchema,
   updateProductSchema,
   productListQuerySchema,
+  productsByIdsQuerySchema,
 } from "../schemas/products";
 
 export const productsController = {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
+      // If ?ids=... is present, short-circuit all other filters and return a flat
+      // ProductDTO[]. Used by the frontend cart/checkout for stock revalidation.
+      if (typeof req.query.ids === "string" && req.query.ids.length > 0) {
+        const { ids } = productsByIdsQuerySchema.parse(req.query);
+        const products = await productsService.listPublicByIds(ids);
+        res.json(products);
+        return;
+      }
       const query = productListQuerySchema.parse(req.query);
       const result = await productsService.listPublic(query);
       res.json(result);

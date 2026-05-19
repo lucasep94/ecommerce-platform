@@ -31,3 +31,13 @@ export const productListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
 });
+
+// Accepts ids as a CSV string in the query (?ids=a,b,c) and normalizes to a cuid[].
+// When present, the products controller short-circuits all other filters.
+export const productsByIdsQuerySchema = z.object({
+  ids: z
+    .string()
+    .min(1)
+    .transform((s) => s.split(",").map((x) => x.trim()).filter(Boolean))
+    .pipe(z.array(z.string().cuid()).min(1).max(50)),
+});

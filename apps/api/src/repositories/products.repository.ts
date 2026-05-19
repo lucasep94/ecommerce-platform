@@ -54,6 +54,12 @@ export const productsRepository = {
     return prisma.product.findFirst({ where: { slug, isActive: true } });
   },
 
+  async findManyByIdsPublic(ids: string[]) {
+    return prisma.product.findMany({
+      where: { id: { in: ids }, isActive: true },
+    });
+  },
+
   async findByIdAdmin(id: string) {
     return prisma.product.findUnique({ where: { id } });
   },

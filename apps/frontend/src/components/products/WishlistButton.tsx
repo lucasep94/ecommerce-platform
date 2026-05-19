@@ -4,8 +4,10 @@ import { useWishlistStore } from "@/lib/wishlist-store";
 
 export function WishlistButton({ productId }: { productId: string }) {
   const toggle = useWishlistStore((s) => s.toggle);
-  const has = useWishlistStore((s) => s.has);
-  const active = has(productId);
+  // Select the boolean directly (not the `has` function) so Zustand re-renders
+  // this button when `ids` changes. Selecting `s.has` returns a stable function
+  // ref and the component would never update.
+  const active = useWishlistStore((s) => s.ids.includes(productId));
 
   return (
     <button

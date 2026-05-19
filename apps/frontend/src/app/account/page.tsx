@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { getMe } from "@/services/auth";
@@ -53,6 +54,23 @@ export default function AccountPage() {
           </dd>
         </dl>
       ) : null}
+
+      <div className="mt-8 grid max-w-md grid-cols-2 gap-3">
+        <Link
+          href="/orders"
+          className="rounded-2xl border border-border bg-white p-5 hover:border-accent"
+        >
+          <p className="font-heading text-[14px] font-semibold text-heading">Your orders</p>
+          <p className="mt-1 font-body text-[12px] text-muted">View order history and status</p>
+        </Link>
+        <Link
+          href="/wishlist"
+          className="rounded-2xl border border-border bg-white p-5 hover:border-accent"
+        >
+          <p className="font-heading text-[14px] font-semibold text-heading">Wishlist</p>
+          <p className="mt-1 font-body text-[12px] text-muted">Items you saved for later</p>
+        </Link>
+      </div>
     </div>
   );
 }

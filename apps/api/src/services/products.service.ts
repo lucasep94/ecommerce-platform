@@ -82,6 +82,11 @@ export const productsService = {
     return toProductDTO(product);
   },
 
+  async listPublicByIds(ids: string[]): Promise<ProductDTO[]> {
+    const items = await productsRepository.findManyByIdsPublic(ids);
+    return items.map(toProductDTO);
+  },
+
   async listAdmin(query: { page: number; pageSize: number }): Promise<Paginated<ProductDTO>> {
     const { page, pageSize } = query;
     const skip = (page - 1) * pageSize;
