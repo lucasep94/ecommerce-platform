@@ -7,6 +7,7 @@ export interface ProductDTO {
   stock: number;
   images: string[];
   categoryId: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,10 +22,19 @@ export interface CreateProductDTO {
   categoryId: string;
 }
 
-export type UpdateProductDTO = Partial<CreateProductDTO>;
+export interface UpdateProductDTO extends Partial<CreateProductDTO> {
+  isActive?: boolean;
+}
 
 export interface CategoryDTO {
   id: string;
   slug: string;
   name: string;
 }
+
+export interface CreateCategoryDTO {
+  slug: string;
+  name: string;
+}
+
+export type UpdateCategoryDTO = Partial<CreateCategoryDTO>;

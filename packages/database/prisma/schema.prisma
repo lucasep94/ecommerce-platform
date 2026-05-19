@@ -50,6 +50,7 @@ model Product {
   stock       Int      @default(0)
   images      String[]
   categoryId  String
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -57,6 +58,7 @@ model Product {
   orderItems OrderItem[]
 
   @@index([categoryId])
+  @@index([isActive])
 }
 
 model Order {

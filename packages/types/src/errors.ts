@@ -3,6 +3,7 @@ export type ApiErrorCode =
   | "UNAUTHORIZED"
   | "FORBIDDEN"
   | "NOT_FOUND"
+  | "CONFLICT"
   | "INTERNAL_ERROR";
 
 export interface ApiErrorBody {
