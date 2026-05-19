@@ -30,7 +30,7 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 - `apps/frontend/.env.example` added; frontend `.gitignore` fixed to allow `.env.example`
 - **Merged:** PR #13
 
-### 🔜 Phase 1 — Auth & users (Clerk + backend integration) ← next
+### ✅ Phase 1 — Auth & users (Clerk + backend integration)
 - **Identity provider: Clerk.** Handles email/password signup, Google OAuth (and other social providers toggleable in the Clerk dashboard), session management, password reset, email verification. The frontend UI for this lands in Phase 5; Phase 1 covers the backend integration only.
 - Schema change: `User.passwordHash` removed; `User.clerkUserId String @unique` added. `User.id` stays as `cuid()` so existing FKs (`Order.userId`, etc.) are unchanged.
 - Backend deps: add `@clerk/backend`; remove `bcrypt` and `jsonwebtoken`.
@@ -50,12 +50,18 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
   - With a valid Clerk session token: `GET /auth/me` returns the local `UserDTO` (and creates the row on first call, including `email` and `name` synced from Clerk).
   - Without a token or with an invalid one: `GET /auth/me` returns `401 UNAUTHORIZED`.
   - A second call with the same Clerk user reuses the existing local row (no duplicate insert; the `clerkUserId` unique index makes this deterministic).
+- **Merged:** PR #14
 
-### Phase 2 — Catalog (backend)
+### 🔄 Phase 2 — Catalog (backend) ← in progress
 - Admin CRUD for categories and products; public read endpoints
 - Pagination, filter by category, search by name / slug (Postgres `ILIKE` is sufficient at MVP scale; revisit with `pg_trgm` or full-text if catalog grows past ~10k products)
 - Seed script in `packages/database/` with sample products (Faker.js)
 - **Reuse:** `ProductDTO`, `CategoryDTO`, `CreateProductDTO` from `packages/types/src/product.ts`
+- **Decision — soft delete:** `Product.isActive Boolean @default(true)`. Public reads filter `isActive: true`; admin `GET /products/admin/all` returns all. `DELETE` sets `isActive: false`; idempotent if already inactive. Preserves FK integrity with `OrderItem.productId`.
+- **Decision — slug strategy:** slug required in request body for both products and categories. Zod validates kebab-case format (`/^[a-z0-9]+(?:-[a-z0-9]+)*$/`). Slug uniqueness violations (Prisma `P2002`) map to `409 CONFLICT`.
+- **Decision — category filter:** `?category=<slug>` (not `categoryId`). URL-friendly, consumable directly from Next.js SSR route params.
+- **Decision — new error code `CONFLICT`:** added to `ApiErrorCode` in `packages/types/src/errors.ts`. Used for slug duplicates and FK violations (category with products).
+- **Decision — `Paginated<T>` envelope:** new `packages/types/src/pagination.ts` with `{ data, page, pageSize, total }`. Used by both product list endpoints.
 - **Exit criteria:** `GET /products?category=X&page=1` returns paginated seeded data
 
 ### Phase 3 — Orders (backend, no payments yet)
