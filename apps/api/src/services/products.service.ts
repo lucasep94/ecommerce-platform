@@ -20,8 +20,12 @@ function toProductDTO(p: {
   name: string;
   description: string;
   price: number;
+  originalPrice: number | null;
   stock: number;
   images: string[];
+  brand: string;
+  rating: number | null;
+  reviewCount: number;
   categoryId: string;
   isActive: boolean;
   createdAt: Date;
@@ -33,8 +37,12 @@ function toProductDTO(p: {
     name: p.name,
     description: p.description,
     price: p.price,
+    originalPrice: p.originalPrice,
     stock: p.stock,
     images: p.images,
+    brand: p.brand,
+    rating: p.rating,
+    reviewCount: p.reviewCount,
     categoryId: p.categoryId,
     isActive: p.isActive,
     createdAt: p.createdAt.toISOString(),
@@ -56,11 +64,12 @@ function handlePrismaError(err: unknown, context: "product" | "category"): never
 
 export const productsService = {
   async listPublic(query: ListQuery): Promise<Paginated<ProductDTO>> {
-    const { category, search, page, pageSize } = query;
+    const { category, search, sort, page, pageSize } = query;
     const skip = (page - 1) * pageSize;
     const { items, total } = await productsRepository.findManyPublic({
       categorySlug: category,
       search,
+      sort,
       skip,
       take: pageSize,
     });

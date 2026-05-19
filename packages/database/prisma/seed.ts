@@ -42,18 +42,27 @@ async function main() {
     const suffix = faker.string.alphanumeric(6).toLowerCase();
     const slug = toSlug(name, suffix);
     const category = categories[Math.floor(Math.random() * categories.length)];
-    const imageCount = faker.number.int({ min: 1, max: 3 });
+    const imageCount = faker.number.int({ min: 1, max: 4 });
+    const price = Math.round(parseFloat(faker.commerce.price({ min: 5, max: 500 })) * 100);
+    const hasDiscount = Math.random() < 0.3;
+    const originalPrice = hasDiscount
+      ? Math.round(price * faker.number.float({ min: 1.1, max: 1.4, fractionDigits: 2 }))
+      : null;
 
     await prisma.product.create({
       data: {
         slug,
         name,
         description: faker.commerce.productDescription(),
-        price: Math.round(parseFloat(faker.commerce.price({ min: 5, max: 500 })) * 100),
+        price,
+        originalPrice,
         stock: faker.number.int({ min: 0, max: 50 }),
-        images: Array.from({ length: imageCount }, () =>
-          faker.image.url({ width: 640, height: 480 }),
+        images: Array.from({ length: imageCount }, (_, idx) =>
+          `https://picsum.photos/seed/${slug}-${idx}/640/480`,
         ),
+        brand: faker.company.name(),
+        rating: faker.number.float({ min: 3.5, max: 5, fractionDigits: 1 }),
+        reviewCount: faker.number.int({ min: 12, max: 850 }),
         categoryId: category.id,
         isActive: true,
       },

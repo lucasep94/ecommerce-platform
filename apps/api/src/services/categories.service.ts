@@ -8,8 +8,13 @@ import type { createCategorySchema, updateCategorySchema } from "../schemas/cate
 type CreateInput = z.infer<typeof createCategorySchema>;
 type UpdateInput = z.infer<typeof updateCategorySchema>;
 
-function toCategoryDTO(c: { id: string; slug: string; name: string }): CategoryDTO {
-  return { id: c.id, slug: c.slug, name: c.name };
+function toCategoryDTO(c: {
+  id: string;
+  slug: string;
+  name: string;
+  _count?: { products: number };
+}): CategoryDTO {
+  return { id: c.id, slug: c.slug, name: c.name, productCount: c._count?.products ?? 0 };
 }
 
 function handlePrismaError(err: unknown): never {

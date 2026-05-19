@@ -4,8 +4,12 @@ export interface ProductDTO {
   name: string;
   description: string;
   price: number;
+  originalPrice: number | null;
   stock: number;
   images: string[];
+  brand: string;
+  rating: number | null;
+  reviewCount: number;
   categoryId: string;
   isActive: boolean;
   createdAt: string;
@@ -17,8 +21,12 @@ export interface CreateProductDTO {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number | null;
   stock: number;
   images: string[];
+  brand: string;
+  rating?: number | null;
+  reviewCount?: number;
   categoryId: string;
 }
 
@@ -30,6 +38,7 @@ export interface CategoryDTO {
   id: string;
   slug: string;
   name: string;
+  productCount: number;
 }
 
 export interface CreateCategoryDTO {

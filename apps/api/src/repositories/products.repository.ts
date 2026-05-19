@@ -1,9 +1,12 @@
 import { prisma } from "../lib/prisma";
 import type { CreateProductDTO, UpdateProductDTO } from "@ecommerce/types";
 
+type SortOption = "top" | "newest" | "price-asc" | "price-desc";
+
 interface FindManyPublicParams {
   categorySlug?: string;
   search?: string;
+  sort?: SortOption;
   skip: number;
   take: number;
 }
@@ -13,8 +16,21 @@ interface FindManyAdminParams {
   take: number;
 }
 
+function resolveOrderBy(sort?: SortOption) {
+  switch (sort) {
+    case "top":
+      return [{ rating: "desc" as const }, { reviewCount: "desc" as const }];
+    case "price-asc":
+      return { price: "asc" as const };
+    case "price-desc":
+      return { price: "desc" as const };
+    default:
+      return { createdAt: "desc" as const };
+  }
+}
+
 export const productsRepository = {
-  async findManyPublic({ categorySlug, search, skip, take }: FindManyPublicParams) {
+  async findManyPublic({ categorySlug, search, sort, skip, take }: FindManyPublicParams) {
     const where = {
       isActive: true,
       ...(categorySlug && { category: { slug: categorySlug } }),
@@ -27,7 +43,7 @@ export const productsRepository = {
     };
 
     const [items, total] = await prisma.$transaction([
-      prisma.product.findMany({ where, skip, take, orderBy: { createdAt: "desc" } }),
+      prisma.product.findMany({ where, skip, take, orderBy: resolveOrderBy(sort) }),
       prisma.product.count({ where }),
     ]);
 
