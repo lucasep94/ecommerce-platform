@@ -108,7 +108,7 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 - **Removed:** NextAuth v5, custom refresh logic, 401-refresh queue. Clerk SDK handles token refresh transparently.
 - **Out-of-code work (the user):** copy `apps/frontend/.env.example` to `apps/frontend/.env.local` and fill `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_API_URL`. Ensure `FRONTEND_URL=http://localhost:3000` in `apps/api/.env` for CORS.
 - **Exit criteria:** email/password signup + login works · Google OAuth login works · `/account` redirects unauthenticated users to `/sign-in` · `GET /auth/me` returns the local `UserDTO` for the signed-in Clerk user · home renders 8 products from the live API.
-- **Merged:** PR #TBD
+- **Merged:** PR #19
 
 ### 🔜 Phase 6 — Frontend catalog (SSR)
 - Home, product list, product detail — SSR for SEO
