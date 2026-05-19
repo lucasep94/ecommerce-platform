@@ -89,3 +89,10 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
 }
+
+model IdempotencyKey {
+  key         String   @id
+  orderId     String
+  requestHash String
+  createdAt   DateTime @default(now())
+}

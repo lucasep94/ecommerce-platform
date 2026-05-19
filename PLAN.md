@@ -52,7 +52,7 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
   - A second call with the same Clerk user reuses the existing local row (no duplicate insert; the `clerkUserId` unique index makes this deterministic).
 - **Merged:** PR #14
 
-### 🔄 Phase 2 — Catalog (backend) ← in progress
+### ✅ Phase 2 — Catalog (backend)
 - Admin CRUD for categories and products; public read endpoints
 - Pagination, filter by category, search by name / slug (Postgres `ILIKE` is sufficient at MVP scale; revisit with `pg_trgm` or full-text if catalog grows past ~10k products)
 - Seed script in `packages/database/` with sample products (Faker.js)
@@ -63,8 +63,9 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 - **Decision — new error code `CONFLICT`:** added to `ApiErrorCode` in `packages/types/src/errors.ts`. Used for slug duplicates and FK violations (category with products).
 - **Decision — `Paginated<T>` envelope:** new `packages/types/src/pagination.ts` with `{ data, page, pageSize, total }`. Used by both product list endpoints.
 - **Exit criteria:** `GET /products?category=X&page=1` returns paginated seeded data
+- **Merged:** PR #17
 
-### Phase 3 — Orders (backend, no payments yet)
+### ✅ Phase 3 — Orders (backend, no payments yet)
 - `POST /orders` — create order + items and decrement stock atomically
 - `GET /orders` (own) and `GET /orders/:id`
 - Admin: `PATCH /orders/:id/status`
@@ -79,8 +80,9 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
   - Order placed end-to-end with status `PENDING`; stock decrements
   - Concurrent oversells: a load test of N parallel requests for a product with stock=1 results in exactly 1 success and N-1 `409`s
   - Replaying `POST /orders` with the same `Idempotency-Key` returns the same order, does not create a duplicate
+- **Merged:** PR #18
 
-### Phase 4 — Stripe integration (backend)
+### 🔜 Phase 4 — Stripe integration (backend)
 - Create `PaymentIntent` on order placement, return `clientSecret`
 - `POST /webhooks/stripe` — signature verification, then idempotent handler keyed on `event.id`
 - Order status transitions: `PENDING → PAID` / `CANCELLED`

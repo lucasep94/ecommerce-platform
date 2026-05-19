@@ -4,6 +4,7 @@ export type ApiErrorCode =
   | "FORBIDDEN"
   | "NOT_FOUND"
   | "CONFLICT"
+  | "UNPROCESSABLE_ENTITY"
   | "INTERNAL_ERROR";
 
 export interface ApiErrorBody {

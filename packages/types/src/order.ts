@@ -32,3 +32,7 @@ export interface CreateOrderItemDTO {
 export interface CreateOrderDTO {
   items: CreateOrderItemDTO[];
 }
+
+export interface UpdateOrderStatusDTO {
+  status: OrderStatus;
+}
