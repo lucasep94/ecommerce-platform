@@ -3,7 +3,10 @@ import type { CreateCategoryDTO, UpdateCategoryDTO } from "@ecommerce/types";
 
 export const categoriesRepository = {
   async findAll() {
-    return prisma.category.findMany({ orderBy: { name: "asc" } });
+    return prisma.category.findMany({
+      orderBy: { name: "asc" },
+      include: { _count: { select: { products: { where: { isActive: true } } } } },
+    });
   },
 
   async findById(id: string) {

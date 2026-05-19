@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { UtilityBar } from "@/components/shell/UtilityBar";
 import { Navbar } from "@/components/shell/Navbar";
 import { Footer } from "@/components/shell/Footer";
+import { listCategories } from "@/services/categories";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -23,17 +24,19 @@ export const metadata: Metadata = {
   description: "A modern marketplace for everyday and editorial finds. Curated, fast, fair.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const categories = await listCategories().catch(() => []);
+
   return (
     <html lang="en" className={`${montserrat.variable} ${lato.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>
           <UtilityBar />
-          <Navbar />
+          <Navbar categories={categories} />
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>

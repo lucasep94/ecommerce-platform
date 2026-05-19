@@ -110,12 +110,23 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 - **Exit criteria:** email/password signup + login works · Google OAuth login works · `/account` redirects unauthenticated users to `/sign-in` · `GET /auth/me` returns the local `UserDTO` for the signed-in Clerk user · home renders 8 products from the live API.
 - **Merged:** PR #19
 
-### 🔜 Phase 6 — Frontend catalog (SSR)
-- Home, product list, product detail — SSR for SEO
-- Category nav, search UI
-- **Exit criteria:** Lighthouse SEO ≥ 90 on product detail; metadata + Open Graph populated
+### ✅ Phase 6 — Frontend catalog (SSR)
+- Schema extension: `Product` gained `brand`, `rating`, `reviewCount`, `originalPrice`. `CategoryDTO` gained `productCount`. Re-seeded with Faker. `db push --force-reset` to Supabase.
+- Backend: `sort` query param (`top|newest|price-asc|price-desc`) on `GET /products`; `_count` aggregation on `GET /categories`; `getProductBySlug` returns all new fields.
+- Frontend deps: `zustand` (wishlist + last-viewed with persist middleware).
+- `ProductCard` hi-fi: `next/image`, brand label, badge (discount % / New / Best seller), wishlist heart, rating stars, price + originalPrice + save chip. Replaces `ProductCardSkeleton`.
+- Home (`/`) — server component: category pills, shop-by-category (4-col), top sellers (5-col), newest (5-col), last-viewed (client, horizontal scroll), mini-cat row.
+- `/products` — SSR, async `searchParams`, filters (category pills + search + sort form), `ProductGrid`, `Pagination`.
+- `/products/[slug]` — SSR, `generateMetadata` with title + description + og:image, `ProductGallery`, rating, price/save, stock indicator, "Add to cart" disabled (Phase 7), wishlist button, related products, `TrackLastViewed`.
+- Navbar: search wrapped in `<form action="/products">`, `CategoriesDropdown` client component, `WishlistBadge` (hydration-safe).
+- Zustand stores: `wishlist-store` and `last-viewed-store` both with `persist` middleware, hydration-mismatch guard in badge and last-viewed.
+- **Decision — SSR pattern:** home, /products, /products/[slug] use direct server fetch (no TanStack Query). Only /account keeps TanStack Query. Consistent with Phase 5.
+- **Decision — `listCategories` in layout:** called once as async server component in `app/layout.tsx`; passed as prop to `<Navbar>`. Avoids redundant fetches per page.
+- **Decision — `db push --force-reset`:** used for dev DB (seed-only data); `brand` is NOT NULL without a default so `--accept-data-loss` is insufficient. Reseed ran immediately after.
+- **Merged:** PR #TBD
+- **Exit criteria:** ✅ home renders all product-driven sections · ✅ `/products` filters by category, search, sort with pagination · ✅ `/products/[slug]` has metadata + OG tags · ✅ wishlist persists across reloads · ✅ last-viewed updates on detail visit
 
-### Phase 7 — Cart & checkout (CSR)
+### 🔜 Phase 7 — Cart & checkout (CSR)
 - Client-side cart (Zustand or Context) — no server-side cart for v1; cart lives in localStorage and is replayed at checkout
 - Checkout: address form → `POST /orders` (with `Idempotency-Key` from a UUID generated at checkout-mount) → Stripe Elements with `clientSecret`
 - Order confirmation page — TanStack Query revalidation

@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useUser, UserButton } from "@clerk/nextjs";
+import type { CategoryDTO } from "@ecommerce/types";
+import { CategoriesDropdown } from "./CategoriesDropdown";
+import { WishlistBadge } from "./WishlistBadge";
 
-export function Navbar() {
+export function Navbar({ categories }: { categories: CategoryDTO[] }) {
   const { isLoaded, isSignedIn } = useUser();
 
   return (
@@ -14,19 +17,25 @@ export function Navbar() {
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         </Link>
 
-        <div className="flex h-12 flex-1 items-center overflow-hidden rounded-full border border-border bg-white focus-within:border-accent focus-within:shadow-[0_0_0_4px_rgba(252,175,24,0.12)]">
-          <button className="flex h-full items-center gap-1 border-r border-border px-4 text-[13px] text-text hover:text-heading">
-            All categories ▾
-          </button>
+        <form
+          action="/products"
+          method="get"
+          className="flex h-12 flex-1 items-center overflow-hidden rounded-full border border-border bg-white focus-within:border-accent focus-within:shadow-[0_0_0_4px_rgba(252,175,24,0.12)]"
+        >
+          <CategoriesDropdown categories={categories} />
           <input
+            name="search"
             type="text"
             placeholder="Search products, brands, categories…"
             className="h-full flex-1 bg-transparent px-4 text-[14px] outline-none placeholder:text-muted"
           />
-          <button className="m-1 h-10 rounded-full bg-accent px-6 font-body text-[13px] font-bold text-heading transition-colors hover:bg-[#ffbe3a]">
+          <button
+            type="submit"
+            className="m-1 h-10 rounded-full bg-accent px-6 font-body text-[13px] font-bold text-heading transition-colors hover:bg-[#ffbe3a]"
+          >
             Search
           </button>
-        </div>
+        </form>
 
         <nav className="flex items-center gap-2">
           {isLoaded && isSignedIn ? (
@@ -46,15 +55,17 @@ export function Navbar() {
               <span>Sign in</span>
             </Link>
           )}
-          <button className="relative flex h-10 items-center gap-2 rounded-md px-3 text-[13px] font-medium text-heading hover:bg-border/50">
+          <Link
+            href="/wishlist"
+            className="relative flex h-10 items-center gap-2 rounded-md px-3 text-[13px] font-medium text-heading hover:bg-border/50"
+          >
             <HeartIcon />
             <span>Wishlist</span>
-            <Badge count={0} />
-          </button>
+            <WishlistBadge />
+          </Link>
           <button className="relative flex h-10 items-center gap-2 rounded-md px-3 text-[13px] font-medium text-heading hover:bg-border/50">
             <CartIcon />
             <span>Cart</span>
-            <Badge count={0} />
           </button>
           {isLoaded && isSignedIn ? (
             <div className="ml-2">
@@ -64,15 +75,6 @@ export function Navbar() {
         </nav>
       </div>
     </header>
-  );
-}
-
-function Badge({ count }: { count: number }) {
-  if (count === 0) return null;
-  return (
-    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-heading">
-      {count}
-    </span>
   );
 }
 
