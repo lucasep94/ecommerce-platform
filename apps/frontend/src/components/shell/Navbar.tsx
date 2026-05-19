@@ -5,6 +5,7 @@ import { useUser, UserButton } from "@clerk/nextjs";
 import type { CategoryDTO } from "@ecommerce/types";
 import { CategoriesDropdown } from "./CategoriesDropdown";
 import { WishlistBadge } from "./WishlistBadge";
+import { CartBadge } from "./CartBadge";
 
 export function Navbar({ categories }: { categories: CategoryDTO[] }) {
   const { isLoaded, isSignedIn } = useUser();
@@ -20,7 +21,7 @@ export function Navbar({ categories }: { categories: CategoryDTO[] }) {
         <form
           action="/products"
           method="get"
-          className="flex h-12 flex-1 items-center overflow-hidden rounded-full border border-border bg-white focus-within:border-accent focus-within:shadow-[0_0_0_4px_rgba(252,175,24,0.12)]"
+          className="relative flex h-12 flex-1 items-center rounded-full border border-border bg-white focus-within:border-accent focus-within:shadow-[0_0_0_4px_rgba(252,175,24,0.12)]"
         >
           <CategoriesDropdown categories={categories} />
           <input
@@ -63,10 +64,14 @@ export function Navbar({ categories }: { categories: CategoryDTO[] }) {
             <span>Wishlist</span>
             <WishlistBadge />
           </Link>
-          <button className="relative flex h-10 items-center gap-2 rounded-md px-3 text-[13px] font-medium text-heading hover:bg-border/50">
+          <Link
+            href="/cart"
+            className="relative flex h-10 items-center gap-2 rounded-md px-3 text-[13px] font-medium text-heading hover:bg-border/50"
+          >
             <CartIcon />
             <span>Cart</span>
-          </button>
+            <CartBadge />
+          </Link>
           {isLoaded && isSignedIn ? (
             <div className="ml-2">
               <UserButton />

@@ -4,6 +4,7 @@ import { getProductBySlug, listProducts } from "@/services/products";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { RatingStars } from "@/components/products/RatingStars";
 import { WishlistButton } from "@/components/products/WishlistButton";
+import { ProductDetailActions } from "@/components/products/ProductDetailActions";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { TrackLastViewed } from "@/components/products/TrackLastViewed";
 import { formatPrice, calcSave } from "@/lib/format";
@@ -111,14 +112,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {stockLabel}
           </p>
 
-          <div className="flex gap-3">
-            <button
-              disabled
-              title="Coming in Phase 7"
-              className="flex-1 rounded-full bg-accent py-3.5 font-body text-[14px] font-bold text-heading opacity-50 cursor-not-allowed"
-            >
-              Add to cart
-            </button>
+          <div className="flex items-end gap-3">
+            <ProductDetailActions product={product} />
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border">
               <WishlistButton productId={product.id} />
             </div>

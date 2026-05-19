@@ -19,6 +19,7 @@ export function CategoriesDropdown({ categories }: { categories: CategoryDTO[] }
   return (
     <div ref={ref} className="relative">
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex h-full items-center gap-1 border-r border-border px-4 text-[13px] text-text hover:text-heading"
       >

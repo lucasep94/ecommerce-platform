@@ -25,3 +25,14 @@ export function listProducts(params: ListProductsParams = {}): Promise<Paginated
 export function getProductBySlug(slug: string): Promise<ProductDTO> {
   return apiFetch<ProductDTO>(`/products/${slug}`);
 }
+
+/**
+ * Fetch a batch of products by id for cart/checkout stock revalidation. The
+ * backend returns a flat ProductDTO[] (not paginated) when `ids` is present.
+ * Returns an empty array if `ids` is empty so callers can skip a network call.
+ */
+export function getProductsByIds(ids: string[]): Promise<ProductDTO[]> {
+  if (ids.length === 0) return Promise.resolve([]);
+  const qs = new URLSearchParams({ ids: ids.join(",") }).toString();
+  return apiFetch<ProductDTO[]>(`/products?${qs}`);
+}
