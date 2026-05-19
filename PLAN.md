@@ -120,6 +120,16 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 
 ---
 
+## Tooling backlog (off the critical path)
+
+Items surfaced during the Phase 1 Dependabot cleanup that don't gate any feature but should be tackled before the corresponding upgrade can land. None of them block phase progression.
+
+- **ESLint flat config migration.** The repo is on ESLint 9 but still uses legacy `.eslintrc` config, so `pnpm lint` fails on main (`ESLint couldn't find an eslint.config.(js|mjs|cjs) file`). Fix: add an `eslint.config.js` at the root (and per-app overrides as needed), migrate any existing rules, then accept the next Dependabot ESLint bump. Unblocks PR #4 (and any future ESLint / `eslint-config-next` bumps).
+- **Prisma 6/7 migration.** Prisma 7 changed how the client and model types are exported — `PrismaClient` and named model types like `User` no longer come out of `@prisma/client` directly, and `packages/database/src/index.ts` plus every consumer that imports model types needs to be updated. Worth doing in a dedicated PR with a fresh `prisma generate` and a typecheck pass across `apps/api`. Unblocks PR #6 when it reopens.
+- **TypeScript 6 / `moduleResolution` migration.** TS 6 deprecates `moduleResolution: "Node"` (node10). `apps/api/tsconfig.json` currently uses it. Two paths: (a) add `"ignoreDeprecations": "6.0"` and kick the can to TS 7, or (b) migrate to `"node16"` / `"bundler"` properly — the latter may require `.js` import extensions and a peer-dep audit. Unblocks PR #10 when it reopens.
+
+---
+
 ## Execution order
 
 | Phase | Depends on |
