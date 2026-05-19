@@ -8,10 +8,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   DIRECT_URL: z.string().url(),
 
-  JWT_ACCESS_SECRET: z.string().min(32, "JWT_ACCESS_SECRET must be at least 32 chars"),
-  JWT_REFRESH_SECRET: z.string().min(32, "JWT_REFRESH_SECRET must be at least 32 chars"),
-  JWT_ACCESS_EXPIRES: z.string().default("15m"),
-  JWT_REFRESH_EXPIRES: z.string().default("7d"),
+  CLERK_SECRET_KEY: z.string().min(1),
 
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
