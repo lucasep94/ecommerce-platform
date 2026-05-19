@@ -123,7 +123,7 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 - **Decision — SSR pattern:** home, /products, /products/[slug] use direct server fetch (no TanStack Query). Only /account keeps TanStack Query. Consistent with Phase 5.
 - **Decision — `listCategories` in layout:** called once as async server component in `app/layout.tsx`; passed as prop to `<Navbar>`. Avoids redundant fetches per page.
 - **Decision — `db push --force-reset`:** used for dev DB (seed-only data); `brand` is NOT NULL without a default so `--accept-data-loss` is insufficient. Reseed ran immediately after.
-- **Merged:** PR #TBD
+- **Merged:** PR #20
 - **Exit criteria:** ✅ home renders all product-driven sections · ✅ `/products` filters by category, search, sort with pagination · ✅ `/products/[slug]` has metadata + OG tags · ✅ wishlist persists across reloads · ✅ last-viewed updates on detail visit
 
 ### 🔜 Phase 7 — Cart & checkout (CSR)
