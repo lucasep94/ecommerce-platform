@@ -1,5 +1,7 @@
 # E-commerce — Visión general de arquitectura
 
+> **Development plan & phase status:** see [PLAN.md](PLAN.md)
+
 ## Estructura del monorepo
 
 Un único repositorio gestionado con **pnpm workspaces** y **Turborepo**, con dos aplicaciones independientes y paquetes internos compartidos.
@@ -26,9 +28,9 @@ ecommerce/
 Interfaz de usuario construida con **Next.js 15** usando App Router. Se comunica exclusivamente con la API interna via HTTP.
 
 - Renderizado híbrido: SSR para páginas de catálogo (SEO), CSR para carrito y checkout
-- Autenticación gestionada por **NextAuth v5**, que almacena el JWT en una cookie httpOnly cifrada
+- Autenticación gestionada por **Clerk** (`@clerk/nextjs`): signup/login con email + password y SSO (Google y otros providers toggleables en el dashboard). Clerk gestiona sesión, refresh, password reset y email verification
 - El estado del servidor se gestiona con **TanStack Query**: cache, revalidación y mutations
-- Todos los calls HTTP pasan por una capa de servicios (`services/`) que encapsula la comunicación con la API
+- Todos los calls HTTP pasan por una capa de servicios (`services/`) que encapsula la comunicación con la API y adjunta el session token de Clerk en el header `Authorization`
 
 **Deploy:** Vercel. Detecta automáticamente `apps/frontend` en el monorepo.
 
@@ -38,7 +40,8 @@ Servidor HTTP construido con **Express**. Es el único punto de acceso a la base
 
 - Arquitectura en capas: routes → controllers → services → repositories
 - Validación de requests con **Zod** aplicado explícitamente en cada controller
-- Autenticación stateless con **JWT** (access token de 15 min + refresh token de 7 días)
+- Autenticación: la API verifica el JWT de sesión emitido por **Clerk** (via `@clerk/backend` + JWKS) en cada request. La API no emite ni refresca tokens — eso es responsabilidad de Clerk
+- El primer request autenticado de un usuario nuevo crea su fila en la tabla local `User` (lazy upsert por `clerkUserId`); las siguientes la reusan
 - Los webhooks de Stripe llegan aquí y se verifican con la firma del payload antes de procesarse
 
 **Deploy:** Railway. Detecta `apps/api` y expone el servidor en un dominio propio.
@@ -71,6 +74,12 @@ PostgreSQL hosteado con **Row Level Security** habilitado. Aunque Prisma ya filt
 
 Integrado únicamente en la API. El frontend nunca toca la clave secreta de Stripe — solo recibe el `clientSecret` del PaymentIntent y lo pasa al SDK de Stripe en el browser para completar el pago.
 
+### Clerk — identidad
+
+Identity provider. Maneja signup, login, sesiones, password reset, email verification, y todos los providers OAuth (Google y otros configurables desde el dashboard). El frontend integra con `@clerk/nextjs`; la API verifica los tokens de sesión con `@clerk/backend`. La tabla `User` en nuestra base de datos guarda únicamente datos de perfil propios del negocio (`role`, denormalización de `email`/`name`) y se enlaza con Clerk por `clerkUserId`.
+
+**Regla de la arquitectura — única excepción:** el frontend habla directo con Clerk (no a través de la API) porque es un servicio de identidad externo, igual que NextAuth hablaría con Google directamente. Para todo lo demás (datos de negocio, Stripe, etc.), la API sigue siendo el único punto de acceso.
+
 ---
 
 ## Flujo principal — compra
@@ -92,13 +101,17 @@ Usuario en checkout
 ## Flujo de autenticación
 
 ```
-Login
-  → Frontend envía credenciales      POST /auth/login    (API)
-  → API valida, devuelve tokens      { accessToken, refreshToken }
-  → NextAuth guarda tokens en cookie httpOnly cifrada
-  → Cada request adjunta             Authorization: Bearer <accessToken>
-  → Al expirar el access token       POST /auth/refresh  (API)
-  → Middleware de Next.js bloquea rutas protegidas si no hay sesión válida
+Signup / Login (email-password o Google OAuth)
+  → Frontend usa <SignIn /> / <SignUp /> de @clerk/nextjs
+  → Clerk maneja todo el flow (incluyendo OAuth redirect/callback) y crea la sesión
+  → Frontend obtiene un session token con auth().getToken() / useAuth().getToken()
+  → Cada request a la API adjunta           Authorization: Bearer <clerk_session_token>
+  → API verifica el token con @clerk/backend (JWKS)
+  → Primer request: lazy upsert en tabla User local (clerkUserId → cuid local)
+  → Subsiguientes: requireAuth busca el User local por clerkUserId
+  → clerkMiddleware bloquea rutas protegidas en el frontend si no hay sesión
+
+Refresh de token: lo maneja Clerk SDK de forma transparente — la API no lo ve.
 ```
 
 ---

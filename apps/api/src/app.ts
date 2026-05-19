@@ -3,6 +3,8 @@ import express, { type Application, type Request, type Response } from "express"
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { authRouter } from "./routes/auth.routes";
+import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
 
 const app: Application = express();
 
@@ -26,6 +28,11 @@ app.use("/auth", authLimiter);
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
+
+app.use("/auth", authRouter);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 if (require.main === module) {
   app.listen(env.PORT, () => {
