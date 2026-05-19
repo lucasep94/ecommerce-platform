@@ -82,7 +82,7 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
   - Replaying `POST /orders` with the same `Idempotency-Key` returns the same order, does not create a duplicate
 - **Merged:** PR #18
 
-### 🔜 Phase 4 — Stripe integration (backend)
+### ⏭️ Phase 4 — Stripe integration (backend) ← deferred
 - Create `PaymentIntent` on order placement, return `clientSecret`
 - `POST /webhooks/stripe` — signature verification, then idempotent handler keyed on `event.id`
 - Order status transitions: `PENDING → PAID` / `CANCELLED`
@@ -91,15 +91,26 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
   - Stripe CLI replay flips order to `PAID`
   - Duplicate webhook (same `event.id`) is a no-op — verified by replaying the same event twice and confirming no double-write
   - Invalid signature → 400, no DB write
+- **Decision — deferred:** omitted for the demo. The order flow works end-to-end without payment; orders stay in `PENDING`. Can be added later without breaking any existing contract.
 
-### Phase 5 — Frontend foundation
-- **Clerk integration via `@clerk/nextjs`**: `<ClerkProvider />` at the root, `clerkMiddleware` for route protection, `<SignIn />` / `<SignUp />` components on auth pages (email/password form + Google OAuth button — both rendered by the same component, enabled-state driven by Clerk dashboard config).
-- Typed HTTP layer in `apps/frontend/src/services/` using `@ecommerce/types`; attaches `Authorization: Bearer ${await auth().getToken()}` (server) or `useAuth().getToken()` (client) on every API call.
-- TanStack Query provider, error boundaries, app shell, route protection via Clerk middleware matchers.
-- **Removed:** NextAuth v5, custom refresh logic, 401-refresh queue. Clerk SDK handles token refresh transparently — the queue concern from the earlier plan is moot.
-- **Exit criteria:** email/password signup + login works; Google OAuth login works; protected pages redirect unauthenticated users; `GET /auth/me` from the API returns the local `UserDTO` for the signed-in Clerk user.
+### ✅ Phase 5 — Frontend foundation
+- **Clerk integration via `@clerk/nextjs`**: `<ClerkProvider />` at the root (inside `Providers` client component), `clerkMiddleware` with `createRouteMatcher` for allowlist-based protection, `<SignIn />` / `<SignUp />` pages under `/sign-in` and `/sign-up`.
+- Typed HTTP layer in `apps/frontend/src/services/` (api-client, auth, products) using `@ecommerce/types`; `apiFetch<T>` accepts an optional token and normalizes `ApiErrorBody` into a typed `ApiClientError`.
+- TanStack Query provider co-located with `ClerkProvider` in a `Providers` client component. Default options: `staleTime: 30s`, `refetchOnWindowFocus: false`, `retry: 1`.
+- App shell (utility bar, navbar, footer) styled with the Storely design tokens from `.docs/`. Tokens defined in `globals.css` via `@theme inline` (Tailwind v4 — no `tailwind.config.ts`).
+- Home page is a server component that calls `GET /products?pageSize=8` and renders a 4-col grid of `ProductCardSkeleton`. `/account` is a client component using TanStack Query → `GET /auth/me` with a token from `useAuth().getToken()` — validates the full auth flow end-to-end.
+- Error boundary (`app/error.tsx`) + 404 (`app/not-found.tsx`).
+- **Decision — allowlist route protection:** `clerkMiddleware` protects only `/account(.*)`, `/orders(.*)`, `/checkout(.*)`, `/admin(.*)`. Everything else (home, catalog, sign-in/up) is public. Denylist would force every catalog browse through Clerk middleware unnecessarily.
+- **Decision — single `apiFetch` for SSR + CSR:** one function with an optional `token` param works in both contexts. Server components pass `await (await auth()).getToken()` directly; client components inject the token inside the `queryFn` via `useAuth()`. Avoids two parallel client implementations.
+- **Decision — Clerk v7 API:** `<SignedIn>`/`<SignedOut>` were removed in v7 in favor of async `<Show when="...">` (server) or `useUser()` (client). Navbar uses `useUser()` and is a client component; the rest of the shell stays server-rendered.
+- **Decision — fonts:** Montserrat (headings) + Lato (body) via `next/font/google`. Mapped to `--font-heading` / `--font-body` in `globals.css`. Replaces the Geist defaults from the scaffold.
+- **Decision — no SSR prefetch for TanStack Query yet:** Phase 5's home uses direct `fetch` in a server component. Hydration boundaries for the catalog land in Phase 6 when product list / detail need full SSR for SEO.
+- **Removed:** NextAuth v5, custom refresh logic, 401-refresh queue. Clerk SDK handles token refresh transparently.
+- **Out-of-code work (the user):** copy `apps/frontend/.env.example` to `apps/frontend/.env.local` and fill `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_API_URL`. Ensure `FRONTEND_URL=http://localhost:3000` in `apps/api/.env` for CORS.
+- **Exit criteria:** email/password signup + login works · Google OAuth login works · `/account` redirects unauthenticated users to `/sign-in` · `GET /auth/me` returns the local `UserDTO` for the signed-in Clerk user · home renders 8 products from the live API.
+- **Merged:** PR #TBD
 
-### Phase 6 — Frontend catalog (SSR)
+### 🔜 Phase 6 — Frontend catalog (SSR)
 - Home, product list, product detail — SSR for SEO
 - Category nav, search UI
 - **Exit criteria:** Lighthouse SEO ≥ 90 on product detail; metadata + Open Graph populated
