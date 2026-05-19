@@ -80,7 +80,7 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
   - Order placed end-to-end with status `PENDING`; stock decrements
   - Concurrent oversells: a load test of N parallel requests for a product with stock=1 results in exactly 1 success and N-1 `409`s
   - Replaying `POST /orders` with the same `Idempotency-Key` returns the same order, does not create a duplicate
-- **Merged:** PR #TBD
+- **Merged:** PR #18
 
 ### 🔜 Phase 4 — Stripe integration (backend)
 - Create `PaymentIntent` on order placement, return `clientSecret`
