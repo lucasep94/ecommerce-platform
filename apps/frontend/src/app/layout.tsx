@@ -2,10 +2,6 @@ import type { Metadata } from "next";
 import { Montserrat, Lato } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { UtilityBar } from "@/components/shell/UtilityBar";
-import { Navbar } from "@/components/shell/Navbar";
-import { Footer } from "@/components/shell/Footer";
-import { listCategories } from "@/services/categories";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -24,22 +20,18 @@ export const metadata: Metadata = {
   description: "A modern marketplace for everyday and editorial finds. Curated, fast, fair.",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const categories = await listCategories().catch(() => []);
-
+/**
+ * Root layout — intentionally minimal. The storefront chrome (UtilityBar,
+ * Navbar, Footer) lives in `app/(shop)/layout.tsx` so the admin panel
+ * (`app/admin/*`) can render its own dedicated shell without the shop
+ * navigation. Providers wraps everything because Clerk + TanStack Query
+ * are needed on every route.
+ */
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${montserrat.variable} ${lato.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Providers>
-          <UtilityBar />
-          <Navbar categories={categories} />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

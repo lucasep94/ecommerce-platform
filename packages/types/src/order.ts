@@ -36,3 +36,17 @@ export interface CreateOrderDTO {
 export interface UpdateOrderStatusDTO {
   status: OrderStatus;
 }
+
+/**
+ * Admin-only variant of OrderDTO. Includes the buyer's identity so the
+ * admin orders list can show "who placed this" without an extra round-trip.
+ * The user-facing OrderDTO intentionally does NOT carry this field —
+ * users only ever see their own orders.
+ */
+export interface AdminOrderDTO extends OrderDTO {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}

@@ -1,6 +1,12 @@
 import crypto from "crypto";
 import { Prisma } from "@ecommerce/database";
-import type { OrderDTO, OrderItemDTO, Paginated, OrderStatus } from "@ecommerce/types";
+import type {
+  AdminOrderDTO,
+  OrderDTO,
+  OrderItemDTO,
+  Paginated,
+  OrderStatus,
+} from "@ecommerce/types";
 import { ApiError } from "../lib/api-error";
 import { prisma } from "../lib/prisma";
 import { ordersRepository } from "../repositories/orders.repository";
@@ -8,11 +14,13 @@ import type { z } from "zod";
 import type {
   createOrderSchema,
   orderListQuerySchema,
+  adminOrderListQuerySchema,
   updateOrderStatusSchema,
 } from "../schemas/orders";
 
 type CreateInput = z.infer<typeof createOrderSchema>;
 type ListQuery = z.infer<typeof orderListQuerySchema>;
+type AdminListQuery = z.infer<typeof adminOrderListQuerySchema>;
 type UpdateStatusInput = z.infer<typeof updateOrderStatusSchema>;
 
 const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
@@ -62,6 +70,29 @@ function toOrderDTO(order: {
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
     items: order.items.map(toOrderItemDTO),
+  };
+}
+
+function toAdminOrderDTO(order: {
+  id: string;
+  userId: string;
+  status: OrderStatus;
+  total: number;
+  stripePaymentId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  items: {
+    id: string;
+    orderId: string;
+    productId: string;
+    quantity: number;
+    price: number;
+  }[];
+  user: { id: string; email: string; name: string };
+}): AdminOrderDTO {
+  return {
+    ...toOrderDTO(order),
+    user: order.user,
   };
 }
 
@@ -186,6 +217,18 @@ export const ordersService = {
     return { data: items.map(toOrderDTO), page, pageSize, total };
   },
 
+  async listAdmin(query: AdminListQuery): Promise<Paginated<AdminOrderDTO>> {
+    const { page, pageSize, status, search } = query;
+    const skip = (page - 1) * pageSize;
+    const { items, total } = await ordersRepository.findManyAdmin({
+      skip,
+      take: pageSize,
+      status,
+      search,
+    });
+    return { data: items.map(toAdminOrderDTO), page, pageSize, total };
+  },
+
   async getById(id: string, userId: string): Promise<OrderDTO> {
     const order = await ordersRepository.findById(id);
     if (!order) throw new ApiError("NOT_FOUND", "Order not found", 404);
@@ -193,11 +236,17 @@ export const ordersService = {
     return toOrderDTO(order);
   },
 
-  async updateStatus(id: string, data: UpdateStatusInput): Promise<OrderDTO> {
+  async getByIdAdmin(id: string): Promise<AdminOrderDTO> {
+    const order = await ordersRepository.findByIdAdmin(id);
+    if (!order) throw new ApiError("NOT_FOUND", "Order not found", 404);
+    return toAdminOrderDTO(order);
+  },
+
+  async updateStatus(id: string, data: UpdateStatusInput): Promise<AdminOrderDTO> {
     try {
-      const order = await ordersRepository.updateStatus(id, data.status);
-      const full = await ordersRepository.findById(order.id);
-      return toOrderDTO(full!);
+      await ordersRepository.updateStatus(id, data.status);
+      const full = await ordersRepository.findByIdAdmin(id);
+      return toAdminOrderDTO(full!);
     } catch (err) {
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&

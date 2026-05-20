@@ -19,3 +19,11 @@ export const orderListQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   pageSize: z.coerce.number().int().positive().max(100).default(20),
 });
+
+export const adminOrderListQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(100).default(20),
+  status: z.enum(["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"]).optional(),
+  /** Matches an order id prefix OR a substring of the buyer's email/name. */
+  search: z.string().trim().min(1).optional(),
+});

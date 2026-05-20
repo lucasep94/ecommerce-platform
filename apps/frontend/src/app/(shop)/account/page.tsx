@@ -70,6 +70,20 @@ export default function AccountPage() {
           <p className="font-heading text-[14px] font-semibold text-heading">Wishlist</p>
           <p className="mt-1 font-body text-[12px] text-muted">Items you saved for later</p>
         </Link>
+        {data?.role === "ADMIN" && (
+          // The admin layout also enforces the role check server-side, so
+          // this is a UI affordance, not a gate. Non-admins simply never
+          // see the tile because `data.role` is `CUSTOMER`.
+          <Link
+            href="/admin"
+            className="col-span-2 rounded-2xl border border-accent bg-bg-warm p-5 hover:bg-[#fff3d6]"
+          >
+            <p className="font-heading text-[14px] font-semibold text-heading">Admin panel</p>
+            <p className="mt-1 font-body text-[12px] text-muted">
+              Manage products, categories and orders
+            </p>
+          </Link>
+        )}
       </div>
     </div>
   );

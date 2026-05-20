@@ -3,6 +3,7 @@ import { ordersService } from "../services/orders.service";
 import {
   createOrderSchema,
   orderListQuerySchema,
+  adminOrderListQuerySchema,
   updateOrderStatusSchema,
 } from "../schemas/orders";
 
@@ -42,6 +43,25 @@ export const ordersController = {
     try {
       const data = updateOrderStatusSchema.parse(req.body);
       const order = await ordersService.updateStatus(req.params.id, data);
+      res.json(order);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async listAdmin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const query = adminOrderListQuerySchema.parse(req.query);
+      const result = await ordersService.listAdmin(query);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getByIdAdmin(req: Request<{ id: string }>, res: Response, next: NextFunction) {
+    try {
+      const order = await ordersService.getByIdAdmin(req.params.id);
       res.json(order);
     } catch (err) {
       next(err);
