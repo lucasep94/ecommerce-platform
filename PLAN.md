@@ -123,22 +123,95 @@ Build the backend first — auth, Stripe webhooks, RLS, and transactional stock 
 - **Decision — SSR pattern:** home, /products, /products/[slug] use direct server fetch (no TanStack Query). Only /account keeps TanStack Query. Consistent with Phase 5.
 - **Decision — `listCategories` in layout:** called once as async server component in `app/layout.tsx`; passed as prop to `<Navbar>`. Avoids redundant fetches per page.
 - **Decision — `db push --force-reset`:** used for dev DB (seed-only data); `brand` is NOT NULL without a default so `--accept-data-loss` is insufficient. Reseed ran immediately after.
-- **Merged:** PR #TBD
+- **Merged:** PR #20
 - **Exit criteria:** ✅ home renders all product-driven sections · ✅ `/products` filters by category, search, sort with pagination · ✅ `/products/[slug]` has metadata + OG tags · ✅ wishlist persists across reloads · ✅ last-viewed updates on detail visit
 
-### 🔜 Phase 7 — Cart & checkout (CSR)
-- Client-side cart (Zustand or Context) — no server-side cart for v1; cart lives in localStorage and is replayed at checkout
-- Checkout: address form → `POST /orders` (with `Idempotency-Key` from a UUID generated at checkout-mount) → Stripe Elements with `clientSecret`
-- Order confirmation page — TanStack Query revalidation
-- **Exit criteria:** test-mode card purchase succeeds end-to-end; double-submit on the checkout button creates exactly one order
+### ✅ Phase 7 — Cart & checkout (CSR)
 
-### Phase 8 — Admin panel
-- Product / category CRUD UI
-- Order list with status updates
-- `/admin` route, gated by `role === 'ADMIN'`
-- Parallelizable with Phase 7
+> **Stripe (Phase 4) is deferred.** This phase shipped the full cart → checkout → confirmation flow with the order ending in `PENDING`. The payment step is a stubbed no-op (`lib/payment-stub.ts::confirmPayment`) — Phase 4 swaps it for Stripe Elements without touching the surrounding UI.
 
-### Phase 9 — Hardening & deploy
+- **Cart (client-only):** Zustand store with `persist` middleware (key `storely.cart.v1`), mirrors the wishlist/last-viewed pattern. Hidratación-safe via the same `useHasHydrated` pattern used by `WishlistBadge`. Lives in localStorage.
+- **Add-to-cart wiring:** enabled on `ProductCard` (icon overlay, `stopPropagation` under the outer `<Link>`) and `/products/[slug]` (primary button + quantity selector). Out-of-stock disables the button.
+- **`CartBadge`** next to `WishlistBadge` in the navbar. Cart is now `<Link href="/cart">`, not a `<button>`.
+- **`/cart` page:** line items, qty selector + remove, order summary, CTA to `/checkout`. Stock revalidation on mount via TanStack Query → `getProductsByIds`; clamps quantities, drops deactivated products, warns inline.
+- **`/checkout` page:** address form (validated inline, no `react-hook-form`/`zod` deps added on the frontend), idempotency key in a `useRef` stable across the mount, pre-flight stock check against the cached batch, handles `409 CONFLICT` (back to /cart with message) and `UNAUTHORIZED` (sign-in with `returnUrl`).
+- **Order pages:** `/orders/[id]/confirmation` (dedicated route), `/orders` (own list), `/orders/[id]` (detail). All client components using TanStack Query.
+- **`/wishlist` page (closed a Phase 6 gap):** the navbar link was dead before this PR. Reuses the existing `wishlist-store` + the new `?ids=` endpoint.
+- **`/account` linking:** added tiles for "Your orders" and "Wishlist" so the new routes are reachable from the UI.
+- **Backend addition:** `GET /products?ids=id1,id2,...` — CSV query param on the existing list endpoint. When present, short-circuits all other filters and returns a flat `ProductDTO[]` of `isActive: true` products. Zod array of cuids, max 50. Used by cart, checkout, and wishlist.
+- **Decision — shipping address is captured but not persisted.** Form renders and validates client-side but is **not** sent to the backend. `CreateOrderDTO` stays `{ items }`. No migration. Persisting now would mean re-shaping in Phase 9 with no value delivered. Checkout shows a banner about it.
+- **Decision — confirmation as a dedicated page.** `/orders/[id]/confirmation` is a separate route, not a query-param flag on `/orders/[id]`. Cleaner mental model and easier to A/B / track conversion later.
+- **Decision — totals hard-coded to $0 for shipping and tax.** Logic isolated in `lib/cart-totals.ts` so Phase 9 can swap in real calculation without touching UI. Subtotal = sum of snapshot `price × quantity`. UI labels: "Free" / "Calculated at next phase".
+- **Decision — stock revalidation in both places.** `/cart` mount + `/checkout` submit, both via `getProductsByIds`. TanStack Query cache deduplicates. Backend `409` is still the source of truth — UI revalidation is purely UX polish to fail early before the address form.
+- **Decision — `ids` param on existing `GET /products`, not a new endpoint.** One controller, one Zod schema. Early-returns when `ids` is present.
+- **Decision — idempotency key lives in `useRef`, not state.** Generated once at checkout mount; a new key only on remount. State would risk a key change on rerender and break the dedupe contract.
+- **Decision — no `react-hook-form` / `zod` on frontend.** The address form is simple enough for `useState` + inline validation. Zero new deps.
+- **Decision — `confirmPayment(order)` stub seam.** Phase 4 replaces this function only; the checkout submit handler signature does not change.
+- **Bug fixes that came up during integration:**
+  - `WishlistButton` wasn't re-rendering on toggle — was selecting the function ref (`s.has`) from Zustand instead of the boolean. Changed to `s.ids.includes(productId)`. Same lesson applied in `CartBadge` via `selectItemCount`.
+  - Checkout was redirecting to `/cart` instead of confirmation after a successful submit — `clearCart()` raced `router.push` and the bounce effect fired on the resulting empty state. Added a `placedOrderRef` flag set before `clearCart()` that short-circuits the bounce.
+  - Categories dropdown was clipped — the search `<form>` had `overflow-hidden` to round the corners, which hid the absolute dropdown. Removed it.
+  - Categories button submitted the search form (default `type="submit"` inside a `<form>`). Added `type="button"`.
+- **Exit criteria:** ✅ cart persists, badge updates, clamps to stock · ✅ `/cart` revalidates stock on mount · ✅ checkout creates `PENDING` order, redirects to confirmation, clears cart · ✅ double-click "Place order" creates exactly one order · ✅ `stock = 0` race surfaces a readable 409 · ✅ unauthenticated `/checkout` → sign-in with returnUrl · ✅ `pnpm typecheck` + `pnpm build` green.
+- **Merged:** PR #21
+
+### ✅ Phase 8 — Admin panel
+
+> Admin lives at `/admin` in the same frontend app. First admin promoted manually in DB (`UPDATE "User" SET role='ADMIN' WHERE email='...'`). Stripe is still deferred — admin can flip orders to PAID/SHIPPED/etc. manually for the demo.
+
+#### Backend
+- `GET /orders/admin/all` — list all orders with `status` and `search` filters (search matches order id prefix OR buyer email/name substring, case-insensitive).
+- `GET /orders/admin/:id` — admin detail with `user: { id, email, name }` joined.
+- `PATCH /orders/:id/status` — return shape upgraded to `AdminOrderDTO` (only admins call it).
+- `POST /admin/uploads/sign` — admin-only, mints a Supabase Storage signed upload URL keyed on `products/<cuid>.<ext>`. Allowlist: `image/jpeg|png|webp`.
+- New `lib/supabase.ts` singleton (service-role client).
+- Env vars added to `env.ts` + `.env.example`: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` (defaults to `product-images`).
+
+#### Frontend
+- **Route group refactor:** all storefront routes moved into `app/(shop)/` with their own `layout.tsx` (UtilityBar + Navbar + Footer). `app/layout.tsx` is now minimal (html/body/Providers). `app/admin/*` lives outside `(shop)` and has its own dedicated shell — top bar with logo + "View storefront ↗" + UserButton, sidebar nav, `bg-bg-warm` page background so admins can tell at a glance they're in the dashboard.
+- `services/admin.ts` — typed wrappers for every admin endpoint (`listProductsAdmin`, `createProduct`, `updateProduct`, `softDeleteProduct`, `restoreProduct`, `createCategory`, `updateCategory`, `deleteCategory`, `listOrdersAdmin`, `getOrderAdmin`, `updateOrderStatus`, `signProductImageUpload`, `uploadProductImage`).
+- `app/admin/layout.tsx` — server component, calls `auth().getToken()` + `getMe(token)`, redirects non-admins to `/`. UI gate; backend `requireRole('ADMIN')` is the actual security boundary.
+- `app/admin/page.tsx` — dashboard with tile grid (Products / Categories / Orders).
+- **Categories CRUD** (`/admin/categories`, `.../new`, `.../[id]/edit`) — list table with inline delete, shared `CategoryForm` with auto-slug + manual override. Delete maps `409 CONFLICT` to "Can't delete this category — it still has products."
+- **Products CRUD** (`/admin/products`, `.../new`, `.../[id]/edit`) — list with client-side search/category filter/`Show inactive` toggle (admin endpoint already returns everything), shared `ProductForm` with auto-slug, dollar↔cents conversion at the boundary, category select, and `ImageUploader`. Soft-delete + restore inline.
+- `components/admin/ImageUploader.tsx` — multi-image picker, runs each file through `services/admin.uploadProductImage` (sign → PUT to Supabase → push `publicUrl`), reorder up/down, remove, "Cover" badge on the first image, client-side size/type validation.
+- **Orders admin** (`/admin/orders`, `.../[id]`) — server-side filtered list (status + search) with real pagination, detail with status dropdown + Update button. `StatusBadge` color-coded by state.
+- `next.config.ts` updated with `*.supabase.co/storage/v1/object/public/**` in `remotePatterns` so uploaded images render via `next/image`.
+- `/account` shows an "Admin panel" tile when `data.role === 'ADMIN'` (UI affordance; layout gate is the real check).
+
+#### Decisions
+- **Admin in same frontend, not separate app.** Same bundle, same Clerk session, same theme. Splitting would duplicate Clerk + providers + layout for zero MVP value.
+- **First admin promoted manually in DB.** A `PATCH /users/:id/role` would still need a bootstrap path — out of scope until user management is built.
+- **Server-side role check in layout, on top of middleware.** Middleware enforces "signed in"; layout enforces "signed in AND admin". A logged-in regular user hitting `/admin` is redirected to `/` before any admin UI renders.
+- **`AdminOrderDTO` extends `OrderDTO` with `user: { id, email, name }`.** Admin order list needs buyer identity; the user-facing DTO must not carry it.
+- **Image upload via signed URL, not API proxy.** Frontend → Supabase Storage directly. The API mints a short-lived signed URL and never sees bytes. Avoids doubling traffic and Express body-parser limits.
+- **Public bucket for product images.** Served on the public storefront anyway — no point making them private and adding signed-read overhead on every page.
+- **No DELETE for uploaded images.** Orphans tolerated for the MVP; cleanup job deferred to Phase 9.
+- **No `react-hook-form` / `zod` on the frontend.** Inline validation matches Phase 7 — server-side Zod is the contract.
+- **Soft-delete with "Show inactive" toggle + Restore.** Admin endpoint already returns all rows; filter is purely client-side.
+- **Admin lists use TanStack Query, not server-side fetch.** Mutation flow needs cache invalidation — uniform client-side fetching makes the patterns identical across all three CRUDs.
+- **Route group refactor done at the end of the phase, not at the start.** Felt cleaner once the admin pages existed and we could see the visual collision with the shop nav.
+- **Bucket CORS not configured.** Supabase Storage's public REST API responds with permissive CORS by default; nothing extra needed for signed-URL PUTs.
+- **`PHASE8-PLAN.md` deleted on merge** — folded into this entry.
+
+#### Out-of-code work (the user)
+- Created the `product-images` Supabase Storage bucket (public read).
+- Set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in `apps/api/.env`.
+- Promoted self to ADMIN via SQL.
+
+#### Exit criteria
+- ✅ `/admin` redirects regular users to `/`, unauthenticated to `/sign-in`, lets ADMIN through.
+- ✅ Products create (with image upload) → image renders on public `/products/[slug]`.
+- ✅ Edit, soft-delete, restore round-trip.
+- ✅ Categories create / edit / delete; FK-blocked delete surfaces a readable error.
+- ✅ Orders list shows multi-user data, status filter works, status transitions persist.
+- ✅ Image upload completes in 2 round-trips per file (sign + PUT); API never sees bytes.
+- ✅ Non-admin calling admin endpoints directly gets `403 FORBIDDEN`.
+- ✅ `pnpm typecheck` + `pnpm build` green.
+
+- **Merged:** PR #TBD
+
+### 🔜 Phase 9 — Hardening & deploy
 - Supabase per-table RLS policies (on top of RLS already enabled in Phase 0.5)
   - **Threat model:** the API uses the service role and bypasses RLS, so RLS policies are pure defense-in-depth. Their value is to fail safe if (a) the anon key ever leaks into a client bundle, or (b) a future feature ever calls Supabase from the browser directly. Policies should be restrictive by default: deny all, then allow nothing for anon (until a feature explicitly requires it). Note: with Clerk as the identity provider, `auth.uid()` is not populated in Supabase the way it would be with Supabase Auth — RLS policies key on explicit `user_id` columns rather than `auth.uid()`.
 - Clerk `user.created` webhook → optional pre-provisioning of the local `User` row (deferred from Phase 1). Worth adding here if welcome emails, signup analytics, or eager profile creation become priorities. Pattern mirrors the Stripe webhook handler (signature verification, idempotency keyed on event id).

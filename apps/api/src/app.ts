@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth.routes";
 import { productsRouter } from "./routes/products.routes";
 import { categoriesRouter } from "./routes/categories.routes";
 import { ordersRouter } from "./routes/orders.routes";
+import { uploadsRouter } from "./routes/uploads.routes";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
 
 const app: Application = express();
@@ -36,6 +37,7 @@ app.use("/auth", authRouter);
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);
 app.use("/orders", ordersRouter);
+app.use("/admin/uploads", uploadsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
