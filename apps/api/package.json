@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@clerk/backend": "^1.13.10",
+    "@clerk/backend": "^3.4.13",
     "@ecommerce/database": "workspace:*",
     "@ecommerce/types": "workspace:*",
     "@supabase/supabase-js": "^2.106.0",
